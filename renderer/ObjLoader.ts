@@ -1,5 +1,5 @@
 import { Mesh } from 'three';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import { Geometry } from './Geometry';
 import { BUILT_IN_NORMAL, BUILT_IN_POSITION, BUILT_IN_UV } from './common';
 

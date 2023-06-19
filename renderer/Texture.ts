@@ -1,4 +1,4 @@
-import { createTexture, loadImage } from '../util';
+import { createTexture, loadImage } from './util';
 
 export class Texture {
     public texture: PossibleNullObject<WebGLTexture> = null;
