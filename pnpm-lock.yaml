@@ -1,0 +1,19 @@
+lockfileVersion: 5.3
+
+specifiers:
+  gl-matrix: ^3.4.3
+  lodash: ^4.17.21
+
+devDependencies:
+  gl-matrix: 3.4.3
+  lodash: 4.17.21
+
+packages:
+
+  /gl-matrix/3.4.3:
+    resolution: {integrity: sha512-wcCp8vu8FT22BnvKVPjXa/ICBWRq/zjFfdofZy1WSpQZpphblv12/bOQLBC1rMM7SGOFS9ltVmKOHil5+Ml7gA==}
+    dev: true
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+    dev: true

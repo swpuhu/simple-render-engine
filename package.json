@@ -1,0 +1,24 @@
+{
+  "name": "simple-render-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/swpuhu/simple-render-engine.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/swpuhu/simple-render-engine/issues"
+  },
+  "homepage": "https://github.com/swpuhu/simple-render-engine#readme",
+  "devDependencies": {
+    "gl-matrix": "^3.4.3",
+    "lodash": "^4.17.21"
+  }
+}

@@ -1,4 +1,4 @@
-import { ASSERT, initWebGL } from '../util';
+import { ASSERT, initWebGL } from './util';
 
 type UniformInfoType = {
     type: number;
