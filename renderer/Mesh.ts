@@ -127,7 +127,7 @@ export class Mesh {
         this.material.setProperty(BUILT_IN_LIGHT_DIR, [-1, -0.4, -1]);
     }
 
-    render(gl: RenderContext, camera: Camera): void {
+    public render(gl: RenderContext, camera: Camera): void {
         this.material.use();
 
         if (!this.dataUploaded) {
