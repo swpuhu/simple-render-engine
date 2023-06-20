@@ -1,7 +1,16 @@
+import { Camera } from './Camera';
+import { Effect } from './Effect';
+import { Geometry } from './Geometry';
+import { Material } from './Material';
+import { Mesh } from './Mesh';
+import { Node } from './Node';
+import { ObjLoader } from './ObjLoader';
+import { PhongMaterial } from './PhongMaterial';
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
+import { MaterialPropertyEnum } from './type';
 
-export class SimpleEngine {
+class SimpleEngine {
     private __rfId = -1;
     private __currentScene: Scene | null = null;
     private __renderer: Renderer | null = null;
@@ -35,3 +44,16 @@ export class SimpleEngine {
         cancelAnimationFrame(this.__rfId);
     }
 }
+
+export {
+    Mesh,
+    Node,
+    Material,
+    PhongMaterial,
+    Effect,
+    Geometry,
+    Camera,
+    MaterialPropertyEnum,
+    ObjLoader,
+    SimpleEngine,
+};
