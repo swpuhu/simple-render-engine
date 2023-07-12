@@ -8,7 +8,7 @@ import { Mesh } from './Mesh';
 import { SimpleEngine } from '.';
 import { Node } from './Node';
 import { Camera } from './Camera';
-import { PhongMaterial } from './PhongMaterial';
+import { PhongMaterial } from './material/PhongMaterial';
 import { ObjLoader } from './ObjLoader';
 export function main() {
     const canvas = document.getElementById('canvas4') as HTMLCanvasElement;

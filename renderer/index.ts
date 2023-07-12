@@ -5,7 +5,7 @@ import { Material } from './Material';
 import { Mesh } from './Mesh';
 import { Node } from './Node';
 import { ObjLoader } from './ObjLoader';
-import { PhongMaterial } from './PhongMaterial';
+import { PhongMaterial } from './material/PhongMaterial';
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
 import { MaterialPropertyEnum } from './type';

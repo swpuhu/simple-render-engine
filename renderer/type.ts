@@ -65,6 +65,7 @@ export type MaterialPropertyType = (
 type DepthStencilState = {
     depthTest: boolean;
     depthWrite: boolean;
+    depthFunc?: number;
 };
 
 type BlendState = {

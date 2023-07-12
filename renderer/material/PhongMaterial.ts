@@ -1,8 +1,8 @@
-import { Effect } from './Effect';
-import { Material } from './Material';
-import frag from '../renderer/shader/11-light-frag.glsl';
-import vert from '../renderer/shader/11-light-vert.glsl';
-import { MaterialPropertyEnum } from './type';
+import { Effect } from '../Effect';
+import { Material } from '../Material';
+import frag from '../shader/11-light-frag.glsl';
+import vert from '../shader/11-light-vert.glsl';
+import { MaterialPropertyEnum } from '../type';
 
 export class PhongMaterial extends Material {
     constructor(diffuse = [0.5, 0.5, 0.5], specular = [1, 1, 1]) {

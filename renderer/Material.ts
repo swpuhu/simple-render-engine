@@ -47,6 +47,9 @@ export class Material {
 
         if (this.pipelineState.depthStencilState!.depthTest) {
             gl.enable(gl.DEPTH_TEST);
+            if (this.pipelineState.depthStencilState?.depthFunc !== void 0) {
+                gl.depthFunc(this.pipelineState.depthStencilState?.depthFunc);
+            }
         } else {
             gl.disable(gl.DEPTH_TEST);
         }
