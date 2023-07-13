@@ -1,3 +1,4 @@
+import { Texture } from './Texture';
 import { ASSERT, initWebGL } from './util';
 
 type UniformInfoType = {
@@ -103,6 +104,9 @@ export class Effect {
             case gl.SAMPLER_2D:
                 ASSERT(uniform.texIndex);
                 gl.activeTexture(gl.TEXTURE0 + uniform.texIndex!);
+                if (value instanceof Texture) {
+                    value.createTexture(gl);
+                }
                 gl.bindTexture(gl.TEXTURE_2D, value.texture);
                 gl.uniform1i(uniform.location, uniform.texIndex!);
                 break;

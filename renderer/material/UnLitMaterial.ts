@@ -1,4 +1,5 @@
 import { Effect } from '../Effect';
+import { BlendFactor } from '../Macro';
 import { Material } from '../Material';
 import { Texture } from '../Texture';
 import frag from '../shader/unlit-frag.glsl';
@@ -25,8 +26,8 @@ export class UnLitMaterial extends Material {
             {
                 blendState: {
                     blend: true,
-                    blendSrc: 770,
-                    blendDst: 771,
+                    blendSrc: BlendFactor.SRC_ALPHA,
+                    blendDst: BlendFactor.ONE_MINUS_SRC_ALPHA,
                 },
             }
         );

@@ -6,13 +6,13 @@ export type VertexAttribType = {
 };
 
 export class Geometry {
-    static getPlane(): Geometry {
+    static getQuad(width: number = 1, height: number = 1): Geometry {
         // prettier-ignore
         const vertPos = [
-            -1, -1, -1,
-            1, -1, -1,
-            1, 1, -1,
-            -1, 1, -1
+            -width / 2, -height / 2, -1,
+            width / 2, -height / 2, -1,
+            width / 2, height / 2, -1,
+            -width / 2, height / 2, -1
         ]
         const uvPos = [0, 0, 1, 0, 1, 1, 0, 1];
         const indices = [0, 1, 2, 2, 3, 0];

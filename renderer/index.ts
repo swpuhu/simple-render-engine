@@ -18,6 +18,8 @@ class SimpleEngine {
         gl.getExtension('OES_element_index_uint');
         this.mainLoop = this.mainLoop.bind(this);
         this.__renderer = new Renderer(gl);
+
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
     }
 
     createScene(): Scene {

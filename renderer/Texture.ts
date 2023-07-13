@@ -1,30 +1,44 @@
 import { createTexture, loadImage } from './util';
 
 export class Texture {
-    public texture: PossibleNullObject<WebGLTexture> = null;
-    constructor(protected gl: RenderContext, imgData?: TexImageSource) {
-        this.texture = createTexture(gl);
-        if (imgData) {
-            gl.texImage2D(
-                gl.TEXTURE_2D,
+    private __texture: PossibleNullObject<WebGLTexture> = null;
+    private __gl: PossibleNullObject<RenderContext> = null;
+    private __compiled = false;
+
+    get texture(): PossibleNullObject<WebGLTexture> {
+        return this.__texture;
+    }
+
+    constructor(private __imgData?: TexImageSource) {}
+
+    public createTexture(gl: RenderContext) {
+        if (this.__compiled) {
+            return;
+        }
+        this.__texture = createTexture(gl);
+        this.__gl = gl;
+        if (this.__imgData) {
+            this.setImageData(this.__imgData);
+            this.__compiled = true;
+        }
+    }
+
+    private setImageData(imgData: TexImageSource): void {
+        if (this.__gl) {
+            this.__gl.texImage2D(
+                this.__gl.TEXTURE_2D,
                 0,
-                gl.RGBA,
-                gl.RGBA,
-                gl.UNSIGNED_BYTE,
+                this.__gl.RGBA,
+                this.__gl.RGBA,
+                this.__gl.UNSIGNED_BYTE,
                 imgData
             );
         }
     }
 
-    async loadTexture(src: string): Promise<void> {
+    public async loadTexture(src: string): Promise<void> {
         const img = await loadImage(src);
-        this.gl.texImage2D(
-            this.gl.TEXTURE_2D,
-            0,
-            this.gl.RGBA,
-            this.gl.RGBA,
-            this.gl.UNSIGNED_BYTE,
-            img
-        );
+        this.__imgData = img;
+        this.setImageData(this.__imgData);
     }
 }
