@@ -7,14 +7,14 @@ import vert from '../shader/unlit-vert.glsl';
 import { MaterialPropertyEnum } from '../type';
 
 export class UnLitMaterial extends Material {
-    constructor(texture: Texture) {
+    constructor(texture?: Texture) {
         const unlitEffect = new Effect(vert, frag);
         super(
             unlitEffect,
             [
                 {
                     name: 'u_tex',
-                    value: texture,
+                    value: texture ? texture : undefined,
                     type: MaterialPropertyEnum.SAMPLER_2D,
                 },
                 {

@@ -71,6 +71,9 @@ export class Effect {
     }
 
     public setProperty(name: string, value: any): void {
+        if (value === void 0 || value === null) {
+            return;
+        }
         const uniform = this.uniformsMap.find(item => item.name === name);
         if (!uniform) {
             return;
@@ -79,6 +82,7 @@ export class Effect {
             return;
         }
         const gl = this._gl;
+        
         switch (uniform.type) {
             case gl.FLOAT:
                 gl.uniform1f(uniform.location, value);

@@ -46,7 +46,7 @@ type Matrix4Type = {
 
 type Sampler2DType = {
     type: MaterialPropertyEnum.SAMPLER_2D;
-    value: Texture;
+    value: Texture | null | undefined;
 };
 
 export type MaterialPropertyType = (
