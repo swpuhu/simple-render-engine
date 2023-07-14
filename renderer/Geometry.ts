@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash';
 
 import { BUILT_IN_NORMAL, BUILT_IN_POSITION, BUILT_IN_UV } from './common';
+import { vec3 } from 'gl-matrix';
 
 export type VertexAttribType = {
     name: string;
@@ -158,6 +159,8 @@ export class Geometry {
     private __posIsDirty = false;
     private __normalIsDirty = false;
     private __uvIsDirty = false;
+    private __xRange = 0;
+    private __yRange = 0;
     constructor(
         public vertAttrib: {
             positions: VertexAttribType;
@@ -165,7 +168,9 @@ export class Geometry {
             normals?: VertexAttribType;
             uvs?: VertexAttribType;
         }
-    ) {}
+    ) {
+        this.__computeRange();
+    }
 
     get count(): number {
         return this.vertAttrib.indices.length;
@@ -183,6 +188,39 @@ export class Geometry {
         return this.__uvIsDirty;
     }
 
+    get xRange(): number {
+        return this.__xRange;
+    }
+
+    get yRange(): number {
+        return this.__yRange;
+    }
+
+    private __computeRange(): void {
+        let pos: vec3 = vec3.create();
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
+        const array = this.vertAttrib.positions.array as Float32Array;
+        for (let i = 0; i < array.length; i += 3) {
+            vec3.set(pos, array[i], array[i + 1], array[i + 2]);
+            if (pos[0] < minX) {
+                minX = pos[0];
+            } else if (pos[0] > maxX) {
+                maxX = pos[0];
+            }
+            if (pos[1] < minY) {
+                minY = pos[1];
+            } else if (pos[1] > maxY) {
+                maxY = pos[1];
+            }
+        }
+
+        this.__xRange = maxX - minX;
+        this.__yRange = maxY - minY;
+    }
+
     public hasNormal(): boolean {
         return (
             !!this.vertAttrib.normals &&
@@ -194,9 +232,10 @@ export class Geometry {
         return !!this.vertAttrib.uvs && !!this.vertAttrib.uvs.array.byteLength;
     }
 
-    public setPosData(positions: VertexAttribType): void {
+    public setPosData(array: ArrayBufferView): void {
         this.__posIsDirty = true;
-        this.vertAttrib.positions = positions;
+        this.vertAttrib.positions.array = cloneDeep(array);
+        this.__computeRange();
     }
 
     public setUVData(uv: VertexAttribType): void {
@@ -211,5 +250,6 @@ export class Geometry {
 
     public copyFrom(geo: Geometry) {
         this.vertAttrib = cloneDeep(geo.vertAttrib);
+        this.__computeRange();
     }
 }

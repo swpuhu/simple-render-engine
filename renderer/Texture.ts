@@ -2,7 +2,7 @@ import { createTexture, loadImage } from './util';
 
 export class Texture {
     private __texture: PossibleNullObject<WebGLTexture> = null;
-    private __gl: PossibleNullObject<RenderContext> = null;
+    private __gl: PossibleNullObject<WebGL2RenderingContext> = null;
     private __compiled = false;
     private __tempImg: HTMLImageElement = new Image();
 
@@ -45,7 +45,7 @@ export class Texture {
         }
     }
 
-    public createTexture(gl: RenderContext) {
+    public createTexture(gl: WebGL2RenderingContext) {
         if (this.__compiled) {
             return;
         }
@@ -67,6 +67,7 @@ export class Texture {
                 this.__gl.UNSIGNED_BYTE,
                 imgData
             );
+            this.__gl.generateMipmap(this.__gl.TEXTURE_2D);
         }
     }
 

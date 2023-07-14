@@ -1,7 +1,6 @@
 import { Node } from './Node';
 import { mat4, vec3 } from 'gl-matrix';
 
-
 export function travelNode(node: Node, callback?: (node: Node) => void): void {
     callback && callback(node);
     node.children.forEach(item => travelNode(item, callback));
@@ -67,7 +66,10 @@ export enum REPEAT_MODE {
     MIRRORED_REPEAT,
 }
 
-export function createTexture(gl: WebGLRenderingContext, repeat?: REPEAT_MODE) {
+export function createTexture(
+    gl: WebGL2RenderingContext,
+    repeat?: REPEAT_MODE
+) {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -533,3 +535,29 @@ export function setUniform(
 }
 
 // #endregion lesscode
+
+export function postOrderTravelNodes(
+    node: Node,
+    callback?: (node: Node) => boolean
+): void {
+    let isGoOn = true;
+    const func = (node: Node, callback?: (node: Node) => boolean) => {
+        if (!node || !isGoOn) {
+            return;
+        }
+
+        for (let i = 0; i < node.children.length; i++) {
+            func(node.children[i], callback);
+            if (isGoOn) {
+                return;
+            }
+        }
+
+        if (callback) {
+            isGoOn = callback(node);
+        } else {
+        }
+    };
+
+    func(node, callback);
+}

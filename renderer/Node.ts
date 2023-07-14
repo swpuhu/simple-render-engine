@@ -1,7 +1,8 @@
 import { mat4, vec3 } from 'gl-matrix';
 import { Mesh } from './Mesh';
+import { EventEmitter } from 'eventemitter3';
 
-export class Node {
+export class Node extends EventEmitter {
     protected _children: Node[] = [];
     protected _parent: PossibleNullObject<Node> = null;
     protected translate: { x: number; y: number; z: number } = {
@@ -14,7 +15,10 @@ export class Node {
     protected _tempIdentityMat: mat4 = mat4.create();
     protected _tempWorldInvMat: mat4 = mat4.create();
     protected _mesh: Mesh | null = null;
-    constructor(public name: string) {}
+    protected _tempVec3: vec3 = vec3.create();
+    constructor(public name: string) {
+        super();
+    }
 
     get children(): Node[] {
         return this._children;

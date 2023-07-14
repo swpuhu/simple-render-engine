@@ -16,11 +16,15 @@ export class Mesh {
     private uvBuffer: WebGLBuffer | null = null;
     private _dataUploaded = false;
     constructor(
-        protected geometry: Geometry,
-        protected material: Material,
-        protected node: Node
+        protected _geometry: Geometry,
+        protected _material: Material,
+        protected _node: Node
     ) {
-        node.setMesh(this);
+        _node.setMesh(this);
+    }
+
+    get geometry(): Geometry {
+        return this._geometry;
     }
 
     get dataUploaded(): boolean {
@@ -28,34 +32,34 @@ export class Mesh {
     }
 
     private __updateData(gl: RenderContext): void {
-        if (this.geometry.posIsDirty) {
+        if (this._geometry.posIsDirty) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
             gl.bufferSubData(
                 gl.ARRAY_BUFFER,
                 0,
-                this.geometry.vertAttrib.positions.array
+                this._geometry.vertAttrib.positions.array
             );
         }
 
-        if (this.geometry.normalIsDirty) {
-            if (this.geometry.hasNormal()) {
+        if (this._geometry.normalIsDirty) {
+            if (this._geometry.hasNormal()) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
                 gl.bufferSubData(
                     gl.ARRAY_BUFFER,
                     0,
-                    this.geometry.vertAttrib.normals!.array
+                    this._geometry.vertAttrib.normals!.array
                 );
                 gl.bindBuffer(gl.ARRAY_BUFFER, null);
             }
         }
 
-        if (this.geometry.uvIsDirty) {
-            if (this.geometry.hasUV()) {
+        if (this._geometry.uvIsDirty) {
+            if (this._geometry.hasUV()) {
                 gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
                 gl.bufferSubData(
                     gl.ARRAY_BUFFER,
                     0,
-                    this.geometry.vertAttrib.uvs!.array
+                    this._geometry.vertAttrib.uvs!.array
                 );
                 gl.bindBuffer(gl.ARRAY_BUFFER, null);
             }
@@ -75,26 +79,26 @@ export class Mesh {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(
             gl.ARRAY_BUFFER,
-            this.geometry.vertAttrib.positions.array,
+            this._geometry.vertAttrib.positions.array,
             gl.STATIC_DRAW
         );
         gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-        if (this.geometry.hasNormal()) {
+        if (this._geometry.hasNormal()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
             gl.bufferData(
                 gl.ARRAY_BUFFER,
-                this.geometry.vertAttrib.normals!.array,
+                this._geometry.vertAttrib.normals!.array,
                 gl.STATIC_DRAW
             );
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
 
-        if (this.geometry.hasUV()) {
+        if (this._geometry.hasUV()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
             gl.bufferData(
                 gl.ARRAY_BUFFER,
-                this.geometry.vertAttrib.uvs!.array,
+                this._geometry.vertAttrib.uvs!.array,
                 gl.STATIC_DRAW
             );
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
@@ -103,7 +107,7 @@ export class Mesh {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
         gl.bufferData(
             gl.ELEMENT_ARRAY_BUFFER,
-            this.geometry.vertAttrib.indices,
+            this._geometry.vertAttrib.indices,
             gl.STATIC_DRAW
         );
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
@@ -113,35 +117,35 @@ export class Mesh {
         if (!gl) {
             return;
         }
-        this.material.setPipelineState(gl);
-        this.material.setProperties();
+        this._material.setPipelineState(gl);
+        this._material.setProperties();
 
-        this.material.effect.setProperty('u_world', this.node.getWorldMat());
+        this._material.effect.setProperty('u_world', this._node.getWorldMat());
     }
 
     private bindVertexInfo(gl: RenderContext): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-        let vertName = this.geometry.vertAttrib.positions.name;
-        let layoutIndex = this.material.effect.attribs[vertName];
+        let vertName = this._geometry.vertAttrib.positions.name;
+        let layoutIndex = this._material.effect.attribs[vertName];
         if (layoutIndex !== void 0) {
             gl.vertexAttribPointer(layoutIndex, 3, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(layoutIndex);
         }
 
-        if (this.geometry.hasNormal()) {
+        if (this._geometry.hasNormal()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-            vertName = this.geometry.vertAttrib.normals!.name;
-            layoutIndex = this.material.effect.attribs[vertName];
+            vertName = this._geometry.vertAttrib.normals!.name;
+            layoutIndex = this._material.effect.attribs[vertName];
             if (layoutIndex !== void 0) {
                 gl.vertexAttribPointer(layoutIndex, 3, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(layoutIndex);
             }
         }
 
-        if (this.geometry.hasUV()) {
+        if (this._geometry.hasUV()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
-            vertName = this.geometry.vertAttrib.uvs!.name;
-            layoutIndex = this.material.effect.attribs[vertName];
+            vertName = this._geometry.vertAttrib.uvs!.name;
+            layoutIndex = this._material.effect.attribs[vertName];
             if (layoutIndex !== void 0) {
                 gl.vertexAttribPointer(layoutIndex, 2, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(layoutIndex);
@@ -155,15 +159,15 @@ export class Mesh {
         const projMat = camera.getProjMat();
         const viewInvMat = camera.getViewInvMat();
 
-        this.material.setProperty(BUILT_IN_PROJ, projMat);
-        this.material.setProperty(BUILT_IN_VIEW_INV, viewInvMat);
+        this._material.setProperty(BUILT_IN_PROJ, projMat);
+        this._material.setProperty(BUILT_IN_VIEW_INV, viewInvMat);
         const worldPos = camera.convertToWorldSpace([0, 0, 0]);
-        this.material.setProperty(BUILT_IN_CAMERA_POS, worldPos);
-        this.material.setProperty(BUILT_IN_LIGHT_DIR, [-1, -0.4, -1]);
+        this._material.setProperty(BUILT_IN_CAMERA_POS, worldPos);
+        this._material.setProperty(BUILT_IN_LIGHT_DIR, [-1, -0.4, -1]);
     }
 
     public render(gl: RenderContext, camera: Camera): void {
-        this.material.use();
+        this._material.use();
 
         if (!this.dataUploaded) {
             this.__uploadData(gl);
@@ -171,8 +175,8 @@ export class Mesh {
             this.__updateData(gl);
         }
 
-        if (!this.material.effect.compiled) {
-            this.material.effect.compile(gl);
+        if (!this._material.effect.compiled) {
+            this._material.effect.compile(gl);
         }
 
         this.bindVertexInfo(gl);
@@ -181,7 +185,7 @@ export class Mesh {
 
         this.bindMaterialParams(gl);
 
-        const vertexCount = this.geometry.count;
+        const vertexCount = this._geometry.count;
         gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
     }
 }
