@@ -7,5 +7,6 @@ void main() {
     vec2 scale = u_texTransform.zw;
     vec2 uv = v_uv * scale + offset;
     vec4 t = texture2D(u_tex, uv);
+
     gl_FragColor = t;
 }

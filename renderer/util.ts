@@ -165,12 +165,12 @@ export function readLUTCube(file: string): {
     };
 }
 
-export async function loadImage(src: string) {
+export async function loadImage(src: string, img?: HTMLImageElement) {
     return new Promise<HTMLImageElement>(resolve => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => {
-            resolve(img);
+        const imgEle = img || new Image();
+        imgEle.src = src;
+        imgEle.onload = () => {
+            resolve(imgEle);
         };
     });
 }

@@ -27,7 +27,42 @@ export class Mesh {
         return this._dataUploaded;
     }
 
-    private uploadData(gl: RenderContext): void {
+    private __updateData(gl: RenderContext): void {
+        if (this.geometry.posIsDirty) {
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+            gl.bufferSubData(
+                gl.ARRAY_BUFFER,
+                0,
+                this.geometry.vertAttrib.positions.array
+            );
+        }
+
+        if (this.geometry.normalIsDirty) {
+            if (this.geometry.hasNormal()) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+                gl.bufferSubData(
+                    gl.ARRAY_BUFFER,
+                    0,
+                    this.geometry.vertAttrib.normals!.array
+                );
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            }
+        }
+
+        if (this.geometry.uvIsDirty) {
+            if (this.geometry.hasUV()) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
+                gl.bufferSubData(
+                    gl.ARRAY_BUFFER,
+                    0,
+                    this.geometry.vertAttrib.uvs!.array
+                );
+                gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            }
+        }
+    }
+
+    private __uploadData(gl: RenderContext): void {
         this._dataUploaded = true;
         this.vertexBuffer = gl.createBuffer();
         this.normalBuffer = gl.createBuffer();
@@ -131,7 +166,9 @@ export class Mesh {
         this.material.use();
 
         if (!this.dataUploaded) {
-            this.uploadData(gl);
+            this.__uploadData(gl);
+        } else {
+            this.__updateData(gl);
         }
 
         if (!this.material.effect.compiled) {

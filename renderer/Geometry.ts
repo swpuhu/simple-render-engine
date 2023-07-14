@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 import { BUILT_IN_NORMAL, BUILT_IN_POSITION, BUILT_IN_UV } from './common';
 
 export type VertexAttribType = {
@@ -153,6 +155,9 @@ export class Geometry {
         });
     }
 
+    private __posIsDirty = false;
+    private __normalIsDirty = false;
+    private __uvIsDirty = false;
     constructor(
         public vertAttrib: {
             positions: VertexAttribType;
@@ -166,6 +171,18 @@ export class Geometry {
         return this.vertAttrib.indices.length;
     }
 
+    get posIsDirty(): boolean {
+        return this.__posIsDirty;
+    }
+
+    get normalIsDirty(): boolean {
+        return this.__normalIsDirty;
+    }
+
+    get uvIsDirty(): boolean {
+        return this.__uvIsDirty;
+    }
+
     public hasNormal(): boolean {
         return (
             !!this.vertAttrib.normals &&
@@ -175,5 +192,24 @@ export class Geometry {
 
     public hasUV(): boolean {
         return !!this.vertAttrib.uvs && !!this.vertAttrib.uvs.array.byteLength;
+    }
+
+    public setPosData(positions: VertexAttribType): void {
+        this.__posIsDirty = true;
+        this.vertAttrib.positions = positions;
+    }
+
+    public setUVData(uv: VertexAttribType): void {
+        this.__uvIsDirty = true;
+        this.vertAttrib.uvs = uv;
+    }
+
+    public setNormalData(normal: VertexAttribType): void {
+        this.__posIsDirty = true;
+        this.vertAttrib.normals = normal;
+    }
+
+    public copyFrom(geo: Geometry) {
+        this.vertAttrib = cloneDeep(geo.vertAttrib);
     }
 }
