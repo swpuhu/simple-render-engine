@@ -1,10 +1,12 @@
 import { mat4, vec3 } from 'gl-matrix';
 import { Mesh } from './Mesh';
 import { EventEmitter } from 'eventemitter3';
+import { EngineScript } from './script/EngineScript';
 
 export class Node extends EventEmitter {
     protected _children: Node[] = [];
     protected _parent: PossibleNullObject<Node> = null;
+    protected _scripts: EngineScript[] = [];
     protected translate: { x: number; y: number; z: number } = {
         x: 0,
         y: 0,
@@ -116,5 +118,32 @@ export class Node extends EventEmitter {
         const localPos = vec3.create();
         vec3.transformMat4(localPos, worldPos, this._tempWorldInvMat);
         return localPos;
+    }
+
+    public addScript(scriptCtor: new () => EngineScript) {
+        const s = new scriptCtor();
+        this._scripts.push(s);
+        s.load();
+    }
+
+    public removeScript(script: new () => EngineScript) {
+        const needRemove: EngineScript[] = [];
+        const newScripts: EngineScript[] = [];
+        for (let i = 0; i < this._scripts.length; i++) {
+            if (script instanceof EngineScript) {
+                needRemove.push(this._scripts[i]);
+            } else {
+                newScripts.push(this._scripts[i]);
+            }
+        }
+        needRemove.forEach(item => item.destroy());
+        this._scripts = newScripts;
+    }
+
+    public removeAllScript() {
+        this._scripts.forEach(script => {
+            script.destroy();
+        });
+        this._scripts.length = 0;
     }
 }
