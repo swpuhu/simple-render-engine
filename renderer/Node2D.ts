@@ -1,9 +1,11 @@
 import { vec2, vec3 } from 'gl-matrix';
 import { Node } from './Node';
 import { Event } from './Event';
+import { VertexAssemble2D } from './VertexAssemble2D';
 
 export class Node2D extends Node {
     private __anchor: vec2 = vec2.fromValues(0.5, 0.5);
+    private __assembler: PossibleNullObject<VertexAssemble2D> = null;
 
     public get anchorX(): number {
         return this.__anchor[0];
@@ -27,6 +29,11 @@ export class Node2D extends Node {
         }
         return 0;
     }
+
+    constructor(name: string) {
+        super(name);
+    }
+
     public $hitTest(pointWorldPos: vec2): boolean {
         vec3.zero(this._tempVec3);
         const worldPos = this.convertToWorldSpace(this._tempVec3);

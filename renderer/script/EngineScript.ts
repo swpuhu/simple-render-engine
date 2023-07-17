@@ -1,5 +1,11 @@
+import { Node } from '../Node';
+
 export class EngineScript {
-    private constructor() {}
+    public constructor(public node: Node) {
+        this.afterConstructor();
+    }
+
+    protected afterConstructor(): void {}
 
     protected onLoad(): void {}
 

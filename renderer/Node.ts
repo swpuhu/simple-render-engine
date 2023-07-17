@@ -120,10 +120,13 @@ export class Node extends EventEmitter {
         return localPos;
     }
 
-    public addScript(scriptCtor: new () => EngineScript) {
-        const s = new scriptCtor();
+    public addScript<T extends EngineScript>(
+        scriptCtor: new (node: Node) => T
+    ): T {
+        const s = new scriptCtor(this);
         this._scripts.push(s);
         s.load();
+        return s;
     }
 
     public removeScript(script: new () => EngineScript) {
@@ -138,6 +141,19 @@ export class Node extends EventEmitter {
         }
         needRemove.forEach(item => item.destroy());
         this._scripts = newScripts;
+    }
+
+    public getScript<T extends EngineScript>(
+        scriptCtor: new (node: Node) => T
+    ): T | null {
+        let script: T | null = null;
+        for (let i = 0; i < this._scripts.length; i++) {
+            if (this._scripts[i] instanceof scriptCtor) {
+                script = this._scripts[i] as T;
+                break;
+            }
+        }
+        return script;
     }
 
     public removeAllScript() {

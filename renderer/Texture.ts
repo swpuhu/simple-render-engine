@@ -59,6 +59,7 @@ export class Texture {
 
     private setImageData(imgData: TexImageSource): void {
         if (this.__gl) {
+            this.__gl.bindTexture(this.__gl.TEXTURE_2D, this.texture);
             this.__gl.texImage2D(
                 this.__gl.TEXTURE_2D,
                 0,
@@ -67,7 +68,17 @@ export class Texture {
                 this.__gl.UNSIGNED_BYTE,
                 imgData
             );
+        }
+    }
+
+    private __enableMipMap(): void {
+        if (this.__gl) {
             this.__gl.generateMipmap(this.__gl.TEXTURE_2D);
+            this.__gl.texParameteri(
+                this.__gl.TEXTURE_2D,
+                this.__gl.TEXTURE_MIN_FILTER,
+                this.__gl.NEAREST_MIPMAP_NEAREST
+            );
         }
     }
 
