@@ -6,6 +6,8 @@ import { VertexAssemble2D } from './VertexAssemble2D';
 export class Node2D extends Node {
     private __anchor: vec2 = vec2.fromValues(0.5, 0.5);
     private __assembler: PossibleNullObject<VertexAssemble2D> = null;
+    private __width: number = 0;
+    private __height: number = 0;
 
     public get anchorX(): number {
         return this.__anchor[0];
@@ -15,19 +17,19 @@ export class Node2D extends Node {
     }
 
     public get width(): number {
-        const geo = this.mesh?.geometry;
-        if (geo) {
-            return geo.xRange;
-        }
-        return 0;
+        return this.__width;
+    }
+
+    public set width(v: number) {
+        this.__width = v;
     }
 
     public get height(): number {
-        const geo = this.mesh?.geometry;
-        if (geo) {
-            return geo.yRange;
-        }
-        return 0;
+        return this.__height;
+    }
+
+    public set height(v: number) {
+        this.__height = v;
     }
 
     constructor(name: string) {

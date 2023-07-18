@@ -4,36 +4,28 @@ import { EngineScript } from './script/EngineScript';
 
 export class VertexAssemble2D extends EngineScript {
     private __tempVec3: vec3 = vec3.create();
-    private __node: Node2D | null = null;
-
-    public setNode(node: Node2D) {
-        this.__node = node;
-    }
 
     public uploadData(
         posBufferView: Float32Array,
         uvBufferView: Float32Array,
-        indexBufferView: Uint16Array,
+        indexBufferView: Uint32Array,
         offset: number,
         indexOffset: number
     ): number[] {
-        if (!this.__node) {
+        if (!this.node || !(this.node instanceof Node2D)) {
             return [offset, indexOffset];
         }
-        const worldMat = this.__node.getWorldMat();
-        const minX = this.__node.x - this.__node.width * this.__node.anchorX;
-        const minY = this.__node.y - this.__node.height * this.__node.anchorY;
-        const maxX =
-            this.__node.x + this.__node.width * (1 - this.__node.anchorX);
-        const maxY =
-            this.__node.y + this.__node.height * (1 - this.__node.anchorY);
+        const worldMat = this.node.getWorldMat();
+        const minX = this.node.x - this.node.width * this.node.anchorX;
+        const minY = this.node.y - this.node.height * this.node.anchorY;
+        const maxX = this.node.x + this.node.width * (1 - this.node.anchorX);
+        const maxY = this.node.y + this.node.height * (1 - this.node.anchorY);
         vec3.transformMat4(
             this.__tempVec3,
             vec3.fromValues(minX, minY, 0),
             worldMat
         );
         const lb = vec3.clone(this.__tempVec3);
-        vec3.transformMat4(lb, lb, worldMat);
 
         vec3.transformMat4(
             this.__tempVec3,
@@ -41,7 +33,6 @@ export class VertexAssemble2D extends EngineScript {
             worldMat
         );
         const rb = vec3.clone(this.__tempVec3);
-        vec3.transformMat4(rb, rb, worldMat);
 
         vec3.transformMat4(
             this.__tempVec3,
@@ -49,7 +40,6 @@ export class VertexAssemble2D extends EngineScript {
             worldMat
         );
         const lt = vec3.clone(this.__tempVec3);
-        vec3.transformMat4(lt, lt, worldMat);
 
         vec3.transformMat4(
             this.__tempVec3,
@@ -57,23 +47,23 @@ export class VertexAssemble2D extends EngineScript {
             worldMat
         );
         const rt = vec3.clone(this.__tempVec3);
-        vec3.transformMat4(rt, rt, worldMat);
 
-        posBufferView.set(lb, offset);
-        uvBufferView.set([0, 0], offset);
+        const oIndex = offset;
+        posBufferView.set(lb, oIndex * 3);
+        uvBufferView.set([0, 0], oIndex * 2);
 
-        posBufferView.set(rb, offset + 3);
-        uvBufferView.set([1, 0], offset);
+        posBufferView.set(rb, (oIndex + 1) * 3);
+        uvBufferView.set([1, 0], (oIndex + 1) * 2);
 
-        posBufferView.set(lt, offset + 6);
-        uvBufferView.set([0, 1], offset);
+        posBufferView.set(lt, (oIndex + 2) * 3);
+        uvBufferView.set([0, 1], (oIndex + 2) * 2);
 
-        posBufferView.set(rt, offset + 9);
-        uvBufferView.set([1, 1], offset);
+        posBufferView.set(rt, (oIndex + 3) * 3);
+        uvBufferView.set([1, 1], (oIndex + 3) * 2);
 
         const indices = [0, 1, 2, 2, 1, 3].map(i => i + indexOffset);
         indexBufferView.set(indices);
 
-        return [offset + 12, indexOffset + 6];
+        return [offset + 4, indexOffset + 6];
     }
 }

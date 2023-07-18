@@ -1,11 +1,15 @@
 import { Node } from '../Node';
 
 export class EngineScript {
-    public constructor(public node: Node) {
-        this.afterConstructor();
+    private __initialized = false;
+    public constructor(public node: Node) {}
+
+    public $init(): void {
+        this.__initialized = true;
+        this.onInit();
     }
 
-    protected afterConstructor(): void {}
+    protected onInit(): void {}
 
     protected onLoad(): void {}
 

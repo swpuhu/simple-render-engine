@@ -2,6 +2,7 @@ import { Camera } from './Camera';
 import { Geometry } from './Geometry';
 import { Material } from './Material';
 import { Node } from './Node';
+import { Node2D } from './Node2D';
 import {
     BUILT_IN_CAMERA_POS,
     BUILT_IN_LIGHT_DIR,
@@ -20,6 +21,9 @@ export class Mesh {
         protected _material: Material,
         protected _node: Node
     ) {
+        if (_node instanceof Node2D) {
+            throw new Error('node2D is not allowed mounted to Mesh');
+        }
         _node.setMesh(this);
     }
 

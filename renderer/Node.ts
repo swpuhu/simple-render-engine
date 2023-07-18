@@ -6,7 +6,7 @@ import { EngineScript } from './script/EngineScript';
 export class Node extends EventEmitter {
     protected _children: Node[] = [];
     protected _parent: PossibleNullObject<Node> = null;
-    protected _scripts: EngineScript[] = [];
+    public $scripts: EngineScript[] = [];
     protected translate: { x: number; y: number; z: number } = {
         x: 0,
         y: 0,
@@ -124,7 +124,7 @@ export class Node extends EventEmitter {
         scriptCtor: new (node: Node) => T
     ): T {
         const s = new scriptCtor(this);
-        this._scripts.push(s);
+        this.$scripts.push(s);
         s.load();
         return s;
     }
@@ -132,24 +132,24 @@ export class Node extends EventEmitter {
     public removeScript(script: new () => EngineScript) {
         const needRemove: EngineScript[] = [];
         const newScripts: EngineScript[] = [];
-        for (let i = 0; i < this._scripts.length; i++) {
+        for (let i = 0; i < this.$scripts.length; i++) {
             if (script instanceof EngineScript) {
-                needRemove.push(this._scripts[i]);
+                needRemove.push(this.$scripts[i]);
             } else {
-                newScripts.push(this._scripts[i]);
+                newScripts.push(this.$scripts[i]);
             }
         }
         needRemove.forEach(item => item.destroy());
-        this._scripts = newScripts;
+        this.$scripts = newScripts;
     }
 
     public getScript<T extends EngineScript>(
         scriptCtor: new (node: Node) => T
     ): T | null {
         let script: T | null = null;
-        for (let i = 0; i < this._scripts.length; i++) {
-            if (this._scripts[i] instanceof scriptCtor) {
-                script = this._scripts[i] as T;
+        for (let i = 0; i < this.$scripts.length; i++) {
+            if (this.$scripts[i] instanceof scriptCtor) {
+                script = this.$scripts[i] as T;
                 break;
             }
         }
@@ -157,9 +157,9 @@ export class Node extends EventEmitter {
     }
 
     public removeAllScript() {
-        this._scripts.forEach(script => {
+        this.$scripts.forEach(script => {
             script.destroy();
         });
-        this._scripts.length = 0;
+        this.$scripts.length = 0;
     }
 }

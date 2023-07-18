@@ -1,8 +1,7 @@
-import { autobind } from 'core-decorators';
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
 import { TouchEvent } from './Event';
-import { postOrderTravelNodes } from './util';
+import { postOrderTravelNodes, travelNode } from './util';
 import { vec2 } from 'gl-matrix';
 import { Node2D } from './Node2D';
 
@@ -62,7 +61,19 @@ export class SimpleEngine {
         this.__currentScene = s;
     }
 
+    private __loadScript(): void {
+        if (!this.__currentScene) {
+            return;
+        }
+
+        travelNode(this.__currentScene, node => {
+            const scripts = node.$scripts;
+            scripts.forEach(script => script.$init());
+        });
+    }
+
     run(): void {
+        this.__loadScript();
         this.mainLoop();
     }
 
