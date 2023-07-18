@@ -40,9 +40,9 @@ export class Node2D extends Node {
         vec3.zero(this._tempVec3);
         const worldPos = this.convertToWorldSpace(this._tempVec3);
         const wL = worldPos[0] - this.width * this.anchorX;
-        const wR = worldPos[1] + this.width * (1 - this.anchorX);
-        const wB = worldPos[0] - this.height * this.anchorY;
-        const wT = worldPos[1] + this.height * this.anchorY;
+        const wR = worldPos[0] + this.width * (1 - this.anchorX);
+        const wB = worldPos[1] - this.height * this.anchorY;
+        const wT = worldPos[1] + this.height * (1 - this.anchorY);
         if (
             pointWorldPos[0] >= wL &&
             pointWorldPos[0] <= wR &&
