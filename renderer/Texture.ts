@@ -5,6 +5,7 @@ export class Texture {
     private __gl: PossibleNullObject<WebGL2RenderingContext> = null;
     private __compiled = false;
     private __tempImg: HTMLImageElement = new Image();
+    private __destroyed = false;
 
     get texture(): PossibleNullObject<WebGLTexture> {
         return this.__texture;
@@ -58,6 +59,9 @@ export class Texture {
     }
 
     private setImageData(imgData: TexImageSource): void {
+        if (this.__destroyed) {
+            throw new Error('this texture has been destroyed!');
+        }
         if (this.__gl) {
             this.__gl.bindTexture(this.__gl.TEXTURE_2D, this.texture);
             this.__gl.texImage2D(
@@ -87,5 +91,12 @@ export class Texture {
         this.__imgData = img;
 
         this.setImageData(this.__imgData);
+    }
+
+    public destroy(): void {
+        if (this.__gl && !this.__destroyed) {
+            this.__gl.deleteTexture(this.texture);
+            this.__destroyed = true;
+        }
     }
 }

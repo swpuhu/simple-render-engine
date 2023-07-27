@@ -6,7 +6,7 @@ export class Renderer {
     constructor(private gl: RenderContext) {
         this.__node2DRenderer = new Node2DRenderer(gl);
 
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
     }
 
     render(scene: Scene): void {

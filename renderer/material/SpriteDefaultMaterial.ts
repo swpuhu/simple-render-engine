@@ -24,11 +24,11 @@ export class SpriteDefaultMaterial extends Material {
                 },
             ],
             {
-                // blendState: {
-                //     blend: true,
-                //     blendSrc: BlendFactor.SRC_ALPHA,
-                //     blendDst: BlendFactor.ONE_MINUS_SRC_ALPHA,
-                // },
+                blendState: {
+                    blend: true,
+                    blendSrc: BlendFactor.SRC_ALPHA,
+                    blendDst: BlendFactor.ONE_MINUS_SRC_ALPHA,
+                },
                 cullMode: 'none',
             }
         );

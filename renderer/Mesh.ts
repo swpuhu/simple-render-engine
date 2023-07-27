@@ -11,11 +11,13 @@ import {
 } from './common';
 
 export class Mesh {
+    private __destroyed = false;
     private vertexBuffer: WebGLBuffer | null = null;
     private normalBuffer: WebGLBuffer | null = null;
     private indicesBuffer: WebGLBuffer | null = null;
     private uvBuffer: WebGLBuffer | null = null;
     private _dataUploaded = false;
+    private __gl: RenderContext | null = null;
     constructor(
         protected _geometry: Geometry,
         protected _material: Material,
@@ -71,6 +73,7 @@ export class Mesh {
     }
 
     private __uploadData(gl: RenderContext): void {
+        this.__gl = gl;
         this._dataUploaded = true;
         this.vertexBuffer = gl.createBuffer();
         this.normalBuffer = gl.createBuffer();
@@ -191,5 +194,27 @@ export class Mesh {
 
         const vertexCount = this._geometry.count;
         gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+    }
+
+    public destroy(): void {
+        if (!this.__gl || this.__destroyed) {
+            return;
+        }
+        if (this.vertexBuffer) {
+            this.__gl.deleteBuffer(this.vertexBuffer);
+        }
+        if (this.uvBuffer) {
+            this.__gl.deleteBuffer(this.uvBuffer);
+        }
+
+        if (this.normalBuffer) {
+            this.__gl.deleteBuffer(this.normalBuffer);
+        }
+
+        if (this.indicesBuffer) {
+            this.__gl.deleteBuffer(this.indicesBuffer);
+        }
+
+        this.__destroyed = true;
     }
 }

@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Effect } from './Effect';
-import { BlendMacro } from './glMacro';
 import { MaterialPropertyType, PipeLineStateType } from './type';
+import { BlendFactor } from './Macro';
 
 const defaultPipelineConfig: PipeLineStateType = {
     cullMode: 'back',
@@ -11,8 +11,8 @@ const defaultPipelineConfig: PipeLineStateType = {
     },
     blendState: {
         blend: false,
-        blendSrc: BlendMacro.SRC_ALPHA,
-        blendDst: BlendMacro.ONE_MINUS_SRC_ALPHA,
+        blendSrc: BlendFactor.SRC_ALPHA,
+        blendDst: BlendFactor.ONE_MINUS_SRC_ALPHA,
     },
 };
 export class Material {
