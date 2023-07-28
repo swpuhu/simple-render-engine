@@ -71,7 +71,10 @@ export class Material {
     }
 
     public setProperty(name: string, value: any): void {
-        this.effect.setProperty(name, value);
+        const prop = this.properties.find(item => item.name === name);
+        if (prop) {
+            prop.value = value;
+        }
     }
 
     public setProperties(): void {

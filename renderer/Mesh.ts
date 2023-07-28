@@ -125,9 +125,9 @@ export class Mesh {
             return;
         }
         this._material.setPipelineState(gl);
-        this._material.setProperties();
 
-        this._material.effect.setProperty('u_world', this._node.getWorldMat());
+        this._material.setProperty('u_world', this._node.getWorldMat());
+        this._material.setProperties();
     }
 
     private bindVertexInfo(gl: RenderContext): void {
@@ -165,12 +165,13 @@ export class Mesh {
     private bindCameraParams(camera: Camera): void {
         const projMat = camera.getProjMat();
         const viewInvMat = camera.getViewInvMat();
+        const worldPos = camera.convertToWorldSpace([0, 0, 0]);
 
         this._material.setProperty(BUILT_IN_PROJ, projMat);
         this._material.setProperty(BUILT_IN_VIEW_INV, viewInvMat);
-        const worldPos = camera.convertToWorldSpace([0, 0, 0]);
         this._material.setProperty(BUILT_IN_CAMERA_POS, worldPos);
         this._material.setProperty(BUILT_IN_LIGHT_DIR, [-1, -0.4, -1]);
+        this._material.setProperties();
     }
 
     public render(gl: RenderContext, camera: Camera): void {

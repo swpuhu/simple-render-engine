@@ -11,7 +11,9 @@ export class EngineScript {
 
     protected onInit(): void {}
 
-    protected onLoad(): void {}
+    protected onLoad(): void {
+        this.$init();
+    }
 
     protected onStart(): void {}
 

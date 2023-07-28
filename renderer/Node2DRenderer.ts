@@ -137,9 +137,9 @@ export class Node2DRenderer {
         }
         this.__currentMaterial.use();
         this.__currentMaterial.setPipelineState(gl);
-        this.__currentMaterial.setProperties();
 
         this.__currentMaterial.setProperty('u_proj', this.__projMat);
+        this.__currentMaterial.setProperties();
     }
 
     public render(renderScript: RenderScript) {
@@ -185,5 +185,6 @@ export class Node2DRenderer {
         gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
         this.__offset = 0;
         this.__indexOffset = 0;
+        this.__currentMaterial = null;
     }
 }

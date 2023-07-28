@@ -41,7 +41,7 @@ type Matrix3Type = {
 
 type Matrix4Type = {
     type: MaterialPropertyEnum.MATRIX4;
-    value: number[];
+    value: number[] | ArrayLike<number>;
 };
 
 type Sampler2DType = {

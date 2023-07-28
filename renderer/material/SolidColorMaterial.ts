@@ -2,13 +2,12 @@ import { mat4 } from 'gl-matrix';
 import { Effect } from '../Effect';
 import { BlendFactor } from '../Macro';
 import { Material } from '../Material';
-import { Texture } from '../Texture';
-import frag from '../shader/sprite-frag.glsl';
+import frag from '../shader/solidColor-frag.glsl';
 import vert from '../shader/sprite-vert.glsl';
 import { MaterialPropertyEnum } from '../type';
 
-export class SpriteDefaultMaterial extends Material {
-    constructor(texture?: Texture) {
+export class SolidColorMaterial extends Material {
+    constructor() {
         const unlitEffect = new Effect(vert, frag);
         super(
             unlitEffect,
@@ -19,13 +18,8 @@ export class SpriteDefaultMaterial extends Material {
                     type: MaterialPropertyEnum.MATRIX4,
                 },
                 {
-                    name: 'u_tex',
-                    value: texture ? texture : undefined,
-                    type: MaterialPropertyEnum.SAMPLER_2D,
-                },
-                {
-                    name: 'u_texTransform',
-                    value: [0, 0, 1, 1],
+                    name: 'u_color',
+                    value: [1, 1, 1, 1],
                     type: MaterialPropertyEnum.FLOAT4,
                 },
             ],
@@ -39,7 +33,6 @@ export class SpriteDefaultMaterial extends Material {
                     depthTest: false,
                     depthWrite: false,
                 },
-                cullMode: 'none',
             }
         );
     }
