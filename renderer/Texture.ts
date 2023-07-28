@@ -2,7 +2,7 @@ import { createTexture, loadImage } from './util';
 
 export class Texture {
     private __texture: PossibleNullObject<WebGLTexture> = null;
-    private __gl: PossibleNullObject<WebGL2RenderingContext> = null;
+    private __gl: PossibleNullObject<RenderContext> = null;
     private __compiled = false;
     private __tempImg: HTMLImageElement = new Image();
     private __destroyed = false;
@@ -46,7 +46,7 @@ export class Texture {
         }
     }
 
-    public createTexture(gl: WebGL2RenderingContext) {
+    public createTexture(gl: RenderContext) {
         if (this.__compiled) {
             return;
         }

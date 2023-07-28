@@ -31,4 +31,8 @@ export class Sprite extends RenderScript {
         }
         return this.__texture.loadTexture(url);
     }
+
+    protected onDestroy(): void {
+        this.material?.destroy();
+    }
 }

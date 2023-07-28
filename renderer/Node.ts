@@ -7,6 +7,7 @@ export class Node extends EventEmitter {
     protected _children: Node[] = [];
     protected _parent: PossibleNullObject<Node> = null;
     public $scripts: EngineScript[] = [];
+    private __destroyed = false;
     protected translate: { x: number; y: number; z: number } = {
         x: 0,
         y: 0,
@@ -161,5 +162,15 @@ export class Node extends EventEmitter {
             script.destroy();
         });
         this.$scripts.length = 0;
+    }
+
+    public destroy(): void {
+        if (this.__destroyed) {
+            return;
+        }
+        this._mesh?.destroy();
+        this.$scripts.forEach(script => script.destroy());
+        this.children.forEach(child => child.destroy());
+        this.__destroyed = true;
     }
 }

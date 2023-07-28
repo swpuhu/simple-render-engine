@@ -84,4 +84,8 @@ export class Material {
     public use(): void {
         this.effect.use();
     }
+
+    public destroy(): void {
+        this.effect.destroy();
+    }
 }

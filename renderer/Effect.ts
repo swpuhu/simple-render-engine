@@ -15,6 +15,8 @@ export class Effect {
     private textureCount = 0;
     private _gl: PossibleNullObject<RenderContext> = null;
     private _compiled = false;
+    private __vertexShader: WebGLShader | null = null;
+    private __fragmentShader: WebGLShader | null = null;
     constructor(private vertString: string, private fragString: string) {}
 
     get compiled(): boolean {
@@ -32,7 +34,11 @@ export class Effect {
     public compile(_gl: RenderContext): void {
         this._compiled = true;
         this._gl = _gl;
-        this.program = initWebGL(_gl, this.vertString, this.fragString);
+        [this.__vertexShader, this.__fragmentShader, this.program] = initWebGL(
+            _gl,
+            this.vertString,
+            this.fragString
+        );
 
         if (!this.program) {
             throw new Error('Shader程序初始化失败！');
@@ -82,7 +88,7 @@ export class Effect {
             return;
         }
         const gl = this._gl;
-        
+
         switch (uniform.type) {
             case gl.FLOAT:
                 gl.uniform1f(uniform.location, value);
@@ -122,5 +128,18 @@ export class Effect {
             return;
         }
         this._gl.useProgram(this.program);
+    }
+
+    public destroy(): void {
+        if (
+            this._gl &&
+            this.__vertexShader &&
+            this.__fragmentShader &&
+            this.program
+        ) {
+            this._gl.deleteProgram(this.program);
+            this._gl.deleteShader(this.__vertexShader);
+            this._gl.deleteShader(this.__fragmentShader);
+        }
     }
 }

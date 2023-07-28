@@ -50,14 +50,14 @@ export function initWebGL(
     gl: RenderContext,
     vertexSource: string,
     fragmentSource: string
-) {
+): [WebGLShader, WebGLShader, WebGLProgram] {
     // 根据源代码创建顶点着色器
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
     // 根据源代码创建片元着色器
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
     // 创建 WebGLProgram 程序
     const program = createProgram(gl, vertexShader!, fragmentShader!);
-    return program;
+    return [vertexShader!, fragmentShader!, program!];
 }
 
 export enum REPEAT_MODE {
@@ -66,10 +66,7 @@ export enum REPEAT_MODE {
     MIRRORED_REPEAT,
 }
 
-export function createTexture(
-    gl: WebGL2RenderingContext,
-    repeat?: REPEAT_MODE
-) {
+export function createTexture(gl: RenderContext, repeat?: REPEAT_MODE) {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 

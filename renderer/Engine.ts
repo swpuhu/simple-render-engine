@@ -128,6 +128,7 @@ export class SimpleEngine {
         if (!this.__gl) {
             return;
         }
+        this.stop();
         const canvas = this.__gl.canvas;
         canvas.removeEventListener('click', this.__handleClick as any);
     }
