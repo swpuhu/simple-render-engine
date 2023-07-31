@@ -5,6 +5,9 @@ export class EngineScript {
     public constructor(public node: Node) {}
 
     public $init(): void {
+        if (this.__initialized) {
+            return;
+        }
         this.__initialized = true;
         this.onInit();
     }

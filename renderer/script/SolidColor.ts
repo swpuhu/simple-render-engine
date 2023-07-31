@@ -6,7 +6,7 @@ import { RenderScript } from './RenderScript';
 export class SolidColor extends RenderScript {
     public onInit(): void {
         this.assembler = new VertexAssemble2D(this.node);
-        this.material = new SolidColorMaterial();
+        // this.material = new SolidColorMaterial();
     }
 
     setColor(r: number, g: number, b: number, a: number) {
