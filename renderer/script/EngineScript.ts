@@ -22,10 +22,14 @@ export class EngineScript {
 
     protected onDestroy(): void {}
 
-    protected update(dt: number) {}
+    protected onUpdate(dt: number) {}
 
     public load(): void {
         this.onLoad();
+    }
+
+    public update(dt: number): void {
+        this.onUpdate(dt);
     }
 
     public destroy(): void {

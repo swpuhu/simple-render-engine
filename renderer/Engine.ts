@@ -74,15 +74,19 @@ export class SimpleEngine {
 
     run(): void {
         this.__loadScript();
-        this.mainLoop();
+        this.mainLoop(0);
     }
 
     stop(): void {
         cancelAnimationFrame(this.__rfId);
     }
 
-    private mainLoop(): void {
+    private mainLoop(dt: number): void {
         if (this.__currentScene && this.__renderer) {
+            travelNode(this.__currentScene, node => {
+                const scripts = node.$scripts;
+                scripts.forEach(script => script.update(dt));
+            });
             this.__renderer.render(this.__currentScene);
         }
         this.__rfId = requestAnimationFrame(this.mainLoop);
@@ -117,7 +121,7 @@ export class SimpleEngine {
                     if (hitted) {
                         node.propagateEvent(syntheticEvent);
                     }
-                    return hitted && syntheticEvent.allowPropagation;
+                    return !hitted;
                 }
                 return true;
             });

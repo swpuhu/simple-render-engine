@@ -545,7 +545,7 @@ export function postOrderTravelNodes(
 
         for (let i = 0; i < node.children.length; i++) {
             func(node.children[i], callback);
-            if (isGoOn) {
+            if (!isGoOn) {
                 return;
             }
         }

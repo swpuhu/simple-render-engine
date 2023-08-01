@@ -59,6 +59,8 @@ export class Node2D extends Node {
         if (!this.parent || !(this.parent instanceof Node2D)) {
             return;
         }
-        this.parent.propagateEvent(e);
+        if (e.allowPropagation) {
+            this.parent.propagateEvent(e);
+        }
     }
 }

@@ -16,10 +16,10 @@ export class VertexAssemble2D extends EngineScript {
             return [offset, indexOffset];
         }
         const worldMat = this.node.getWorldMat();
-        const minX = this.node.x - this.node.width * this.node.anchorX;
-        const minY = this.node.y - this.node.height * this.node.anchorY;
-        const maxX = this.node.x + this.node.width * (1 - this.node.anchorX);
-        const maxY = this.node.y + this.node.height * (1 - this.node.anchorY);
+        const minX = -this.node.width * this.node.anchorX;
+        const minY = -this.node.height * this.node.anchorY;
+        const maxX = this.node.width * (1 - this.node.anchorX);
+        const maxY = this.node.height * (1 - this.node.anchorY);
         vec3.transformMat4(
             this.__tempVec3,
             vec3.fromValues(minX, minY, 0),
@@ -61,8 +61,8 @@ export class VertexAssemble2D extends EngineScript {
         posBufferView.set(rt, (oIndex + 3) * 3);
         uvBufferView.set([1, 1], (oIndex + 3) * 2);
 
-        const indices = [0, 1, 2, 2, 1, 3].map(i => i + indexOffset);
-        indexBufferView.set(indices);
+        const indices = [0, 1, 2, 2, 1, 3].map(i => i + offset);
+        indexBufferView.set(indices, indexOffset);
 
         return [offset + 4, indexOffset + 6];
     }
