@@ -2,6 +2,7 @@ import { mat4, vec3 } from 'gl-matrix';
 import { Mesh } from './Mesh';
 import { EventEmitter } from 'eventemitter3';
 import { EngineScript } from './script/EngineScript';
+import { NodeOptions } from './script/util';
 
 export class Node extends EventEmitter {
     protected _children: Node[] = [];
@@ -19,7 +20,7 @@ export class Node extends EventEmitter {
     protected _tempWorldInvMat: mat4 = mat4.create();
     protected _mesh: Mesh | null = null;
     protected _tempVec3: vec3 = vec3.create();
-    constructor(public name: string) {
+    constructor(public name: string, options?: NodeOptions) {
         super();
     }
 
