@@ -26,7 +26,7 @@ export function main() {
         scene.addChildren(node);
     });
     const geo1 = Geometry.getCube();
-    const geo2 = Geometry.getPlane();
+    const geo2 = Geometry.getQuad();
     const effect1 = new Effect(vert, frag);
     const material1 = new Material(
         effect1,

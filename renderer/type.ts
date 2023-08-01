@@ -41,12 +41,12 @@ type Matrix3Type = {
 
 type Matrix4Type = {
     type: MaterialPropertyEnum.MATRIX4;
-    value: number[];
+    value: number[] | ArrayLike<number>;
 };
 
 type Sampler2DType = {
     type: MaterialPropertyEnum.SAMPLER_2D;
-    value: Texture;
+    value: Texture | null | undefined;
 };
 
 export type MaterialPropertyType = (

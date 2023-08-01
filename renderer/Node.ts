@@ -1,9 +1,13 @@
 import { mat4, vec3 } from 'gl-matrix';
 import { Mesh } from './Mesh';
+import { EventEmitter } from 'eventemitter3';
+import { EngineScript } from './script/EngineScript';
 
-export class Node {
+export class Node extends EventEmitter {
     protected _children: Node[] = [];
     protected _parent: PossibleNullObject<Node> = null;
+    public $scripts: EngineScript[] = [];
+    private __destroyed = false;
     protected translate: { x: number; y: number; z: number } = {
         x: 0,
         y: 0,
@@ -14,7 +18,10 @@ export class Node {
     protected _tempIdentityMat: mat4 = mat4.create();
     protected _tempWorldInvMat: mat4 = mat4.create();
     protected _mesh: Mesh | null = null;
-    constructor(public name: string) {}
+    protected _tempVec3: vec3 = vec3.create();
+    constructor(public name: string) {
+        super();
+    }
 
     get children(): Node[] {
         return this._children;
@@ -112,5 +119,58 @@ export class Node {
         const localPos = vec3.create();
         vec3.transformMat4(localPos, worldPos, this._tempWorldInvMat);
         return localPos;
+    }
+
+    public addScript<T extends EngineScript>(
+        scriptCtor: new (node: Node) => T
+    ): T {
+        const s = new scriptCtor(this);
+        this.$scripts.push(s);
+        s.load();
+        return s;
+    }
+
+    public removeScript(script: new () => EngineScript) {
+        const needRemove: EngineScript[] = [];
+        const newScripts: EngineScript[] = [];
+        for (let i = 0; i < this.$scripts.length; i++) {
+            if (script instanceof EngineScript) {
+                needRemove.push(this.$scripts[i]);
+            } else {
+                newScripts.push(this.$scripts[i]);
+            }
+        }
+        needRemove.forEach(item => item.destroy());
+        this.$scripts = newScripts;
+    }
+
+    public getScript<T extends EngineScript>(
+        scriptCtor: new (node: Node) => T
+    ): T | null {
+        let script: T | null = null;
+        for (let i = 0; i < this.$scripts.length; i++) {
+            if (this.$scripts[i] instanceof scriptCtor) {
+                script = this.$scripts[i] as T;
+                break;
+            }
+        }
+        return script;
+    }
+
+    public removeAllScript() {
+        this.$scripts.forEach(script => {
+            script.destroy();
+        });
+        this.$scripts.length = 0;
+    }
+
+    public destroy(): void {
+        if (this.__destroyed) {
+            return;
+        }
+        this._mesh?.destroy();
+        this.$scripts.forEach(script => script.destroy());
+        this.children.forEach(child => child.destroy());
+        this.__destroyed = true;
     }
 }

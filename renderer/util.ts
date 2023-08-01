@@ -1,7 +1,6 @@
 import { Node } from './Node';
 import { mat4, vec3 } from 'gl-matrix';
 
-
 export function travelNode(node: Node, callback?: (node: Node) => void): void {
     callback && callback(node);
     node.children.forEach(item => travelNode(item, callback));
@@ -51,14 +50,14 @@ export function initWebGL(
     gl: RenderContext,
     vertexSource: string,
     fragmentSource: string
-) {
+): [WebGLShader, WebGLShader, WebGLProgram] {
     // 根据源代码创建顶点着色器
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexSource);
     // 根据源代码创建片元着色器
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
     // 创建 WebGLProgram 程序
     const program = createProgram(gl, vertexShader!, fragmentShader!);
-    return program;
+    return [vertexShader!, fragmentShader!, program!];
 }
 
 export enum REPEAT_MODE {
@@ -67,7 +66,7 @@ export enum REPEAT_MODE {
     MIRRORED_REPEAT,
 }
 
-export function createTexture(gl: WebGLRenderingContext, repeat?: REPEAT_MODE) {
+export function createTexture(gl: RenderContext, repeat?: REPEAT_MODE) {
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -165,12 +164,12 @@ export function readLUTCube(file: string): {
     };
 }
 
-export async function loadImage(src: string) {
+export async function loadImage(src: string, img?: HTMLImageElement) {
     return new Promise<HTMLImageElement>(resolve => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => {
-            resolve(img);
+        const imgEle = img || new Image();
+        imgEle.src = src;
+        imgEle.onload = () => {
+            resolve(imgEle);
         };
     });
 }
@@ -533,3 +532,29 @@ export function setUniform(
 }
 
 // #endregion lesscode
+
+export function postOrderTravelNodes(
+    node: Node,
+    callback?: (node: Node) => boolean
+): void {
+    let isGoOn = true;
+    const func = (node: Node, callback?: (node: Node) => boolean) => {
+        if (!node || !isGoOn) {
+            return;
+        }
+
+        for (let i = 0; i < node.children.length; i++) {
+            func(node.children[i], callback);
+            if (isGoOn) {
+                return;
+            }
+        }
+
+        if (callback) {
+            isGoOn = callback(node);
+        } else {
+        }
+    };
+
+    func(node, callback);
+}

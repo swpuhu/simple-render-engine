@@ -1,3 +1,4 @@
+import { Texture } from './Texture';
 import { ASSERT, initWebGL } from './util';
 
 type UniformInfoType = {
@@ -14,6 +15,8 @@ export class Effect {
     private textureCount = 0;
     private _gl: PossibleNullObject<RenderContext> = null;
     private _compiled = false;
+    private __vertexShader: WebGLShader | null = null;
+    private __fragmentShader: WebGLShader | null = null;
     constructor(private vertString: string, private fragString: string) {}
 
     get compiled(): boolean {
@@ -31,7 +34,11 @@ export class Effect {
     public compile(_gl: RenderContext): void {
         this._compiled = true;
         this._gl = _gl;
-        this.program = initWebGL(_gl, this.vertString, this.fragString);
+        [this.__vertexShader, this.__fragmentShader, this.program] = initWebGL(
+            _gl,
+            this.vertString,
+            this.fragString
+        );
 
         if (!this.program) {
             throw new Error('Shader程序初始化失败！');
@@ -70,6 +77,9 @@ export class Effect {
     }
 
     public setProperty(name: string, value: any): void {
+        if (value === void 0 || value === null) {
+            return;
+        }
         const uniform = this.uniformsMap.find(item => item.name === name);
         if (!uniform) {
             return;
@@ -78,6 +88,7 @@ export class Effect {
             return;
         }
         const gl = this._gl;
+
         switch (uniform.type) {
             case gl.FLOAT:
                 gl.uniform1f(uniform.location, value);
@@ -103,6 +114,9 @@ export class Effect {
             case gl.SAMPLER_2D:
                 ASSERT(uniform.texIndex);
                 gl.activeTexture(gl.TEXTURE0 + uniform.texIndex!);
+                if (value instanceof Texture) {
+                    value.createTexture(gl);
+                }
                 gl.bindTexture(gl.TEXTURE_2D, value.texture);
                 gl.uniform1i(uniform.location, uniform.texIndex!);
                 break;
@@ -114,5 +128,18 @@ export class Effect {
             return;
         }
         this._gl.useProgram(this.program);
+    }
+
+    public destroy(): void {
+        if (
+            this._gl &&
+            this.__vertexShader &&
+            this.__fragmentShader &&
+            this.program
+        ) {
+            this._gl.deleteProgram(this.program);
+            this._gl.deleteShader(this.__vertexShader);
+            this._gl.deleteShader(this.__fragmentShader);
+        }
     }
 }

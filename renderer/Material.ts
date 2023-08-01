@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { Effect } from './Effect';
-import { BlendMacro } from './glMacro';
 import { MaterialPropertyType, PipeLineStateType } from './type';
+import { BlendFactor } from './Macro';
 
 const defaultPipelineConfig: PipeLineStateType = {
     cullMode: 'back',
@@ -11,8 +11,8 @@ const defaultPipelineConfig: PipeLineStateType = {
     },
     blendState: {
         blend: false,
-        blendSrc: BlendMacro.SRC_ALPHA,
-        blendDst: BlendMacro.ONE_MINUS_SRC_ALPHA,
+        blendSrc: BlendFactor.SRC_ALPHA,
+        blendDst: BlendFactor.ONE_MINUS_SRC_ALPHA,
     },
 };
 export class Material {
@@ -71,7 +71,10 @@ export class Material {
     }
 
     public setProperty(name: string, value: any): void {
-        this.effect.setProperty(name, value);
+        const prop = this.properties.find(item => item.name === name);
+        if (prop) {
+            prop.value = value;
+        }
     }
 
     public setProperties(): void {
@@ -83,5 +86,9 @@ export class Material {
 
     public use(): void {
         this.effect.use();
+    }
+
+    public destroy(): void {
+        this.effect.destroy();
     }
 }
