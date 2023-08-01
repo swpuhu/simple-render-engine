@@ -2,7 +2,15 @@ import { vec2, vec3 } from 'gl-matrix';
 import { Node } from './Node';
 import { Event } from './Event';
 import { VertexAssemble2D } from './VertexAssemble2D';
-
+import { clamp } from './util';
+type Node2DOptions = {
+    width?: number;
+    height?: number;
+    x?: number;
+    y?: number;
+    anchorX?: number;
+    anchorY?: number;
+};
 export class Node2D extends Node {
     private __anchor: vec2 = vec2.fromValues(0.5, 0.5);
     private __assembler: PossibleNullObject<VertexAssemble2D> = null;
@@ -14,6 +22,12 @@ export class Node2D extends Node {
     }
     public get anchorY(): number {
         return this.__anchor[1];
+    }
+    public set anchorX(v: number) {
+        this.__anchor[0] = clamp(v, 0, 1);
+    }
+    public set anchorY(v: number) {
+        this.__anchor[1] = clamp(v, 0, 1);
     }
 
     public get width(): number {
@@ -32,8 +46,16 @@ export class Node2D extends Node {
         this.__height = v;
     }
 
-    constructor(name: string) {
+    constructor(name: string, options?: Node2DOptions) {
         super(name);
+        if (options) {
+            this.__width = options.width || 0;
+            this.__height = options.height || 0;
+            this.x = options.x || 0;
+            this.y = options.y || 0;
+            this.anchorX = options.anchorX !== void 0 ? options.anchorX : 0.5;
+            this.anchorY = options.anchorY !== void 0 ? options.anchorY : 0.5;
+        }
     }
 
     public $hitTest(pointWorldPos: vec2): boolean {
