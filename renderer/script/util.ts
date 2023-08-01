@@ -12,6 +12,7 @@ export type NodeOptions = {
 export type Node2DOptions = {
     anchorX?: number;
     anchorY?: number;
+    rotation?: number;
 } & NodeOptions;
 
 export type HierarchyTree = {
@@ -41,4 +42,12 @@ export function createHierarchyTree(tree: HierarchyTree[]) {
     }
 
     return result;
+}
+
+export function rad2Angle(rad: number): number {
+    return (rad / Math.PI) * 180;
+}
+
+export function angle2Rad(angle: number): number {
+    return (angle / 180) * Math.PI;
 }

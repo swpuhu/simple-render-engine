@@ -1,4 +1,4 @@
-import { vec2, vec3 } from 'gl-matrix';
+import { mat4, vec2, vec3 } from 'gl-matrix';
 import { Node } from './Node';
 import { Event } from './Event';
 import { VertexAssemble2D } from './VertexAssemble2D';
@@ -10,6 +10,7 @@ export class Node2D extends Node {
     private __assembler: PossibleNullObject<VertexAssemble2D> = null;
     private __width: number = 0;
     private __height: number = 0;
+    private __rotation: number = 0;
 
     public get anchorX(): number {
         return this.__anchor[0];
@@ -40,6 +41,15 @@ export class Node2D extends Node {
         this.__height = v;
     }
 
+    public get rotation(): number {
+        return this.__rotation;
+    }
+
+    public set rotation(v: number) {
+        this.__rotation = v;
+        this._updateLocalMat();
+    }
+
     constructor(name: string, options?: Node2DOptions) {
         super(name);
         if (options) {
@@ -49,7 +59,18 @@ export class Node2D extends Node {
             this.y = options.y || 0;
             this.anchorX = options.anchorX !== void 0 ? options.anchorX : 0.5;
             this.anchorY = options.anchorY !== void 0 ? options.anchorY : 0.5;
+            this.rotation = options.rotation || 0;
         }
+    }
+
+    protected _updateLocalMat(): void {
+        this._localMat = mat4.translate(this._localMat, this._tempIdentityMat, [
+            this.translate.x,
+            this.translate.y,
+            this.translate.z,
+        ]);
+        mat4.rotateZ(this._localMat, this._localMat, this.__rotation);
+        this._updateWorldMat();
     }
 
     public $hitTest(pointWorldPos: vec2): boolean {
