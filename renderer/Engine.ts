@@ -1,9 +1,10 @@
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
-import { TouchEvent } from './Event';
+import { Event, TouchEvent } from './Event';
 import { postOrderTravelNodes, travelNode } from './util';
 import { vec2 } from 'gl-matrix';
 import { Node2D } from './Node2D';
+import { EventManager } from './EventManager';
 
 export class SimpleEngine {
     private __rfId = -1;
@@ -12,6 +13,8 @@ export class SimpleEngine {
     private __gl: WebGL2RenderingContext | null = null;
     private __canvasDomWidth = 0;
     private __canvasDomHeight = 0;
+    private __eventManager: EventManager;
+    private __initialized = false;
 
     public get canvasDomWidth(): number {
         if (this.__canvasDomWidth === 0) {
@@ -37,8 +40,14 @@ export class SimpleEngine {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.__gl = gl;
 
-        this.__handleClick = this.__handleClick.bind(this);
-        this.__handleEvents();
+        this.__eventManager = new EventManager(gl.canvas as HTMLCanvasElement);
+    }
+
+    private __init(): void {
+        if (this.__eventManager) {
+            this.__eventManager.init();
+        }
+        this.__initialized = true;
     }
 
     setViewSize(width: number, height: number): void {
@@ -59,6 +68,9 @@ export class SimpleEngine {
 
     setScene(s: Scene): void {
         this.__currentScene = s;
+        if (this.__eventManager) {
+            this.__eventManager.setScene(s);
+        }
     }
 
     private __loadScript(): void {
@@ -82,6 +94,9 @@ export class SimpleEngine {
     }
 
     private mainLoop(dt: number): void {
+        if (!this.__initialized) {
+            this.__init();
+        }
         if (this.__currentScene && this.__renderer) {
             travelNode(this.__currentScene, node => {
                 const scripts = node.$scripts;
@@ -92,48 +107,13 @@ export class SimpleEngine {
         this.__rfId = requestAnimationFrame(this.mainLoop);
     }
 
-    private __handleEvents(): void {
-        if (!this.__gl) {
-            return;
-        }
-        const canvas = this.__gl.canvas;
-        canvas.addEventListener('click', this.__handleClick as any);
-    }
-
-    private __handleClick(e: MouseEvent): void {
-        const gl = this.__gl;
-        if (!gl) {
-            return;
-        }
-        const canvas = gl.canvas;
-        const syntheticEvent = new TouchEvent();
-        const x = (e.offsetX / this.canvasDomWidth) * canvas.width;
-        const y =
-            ((this.canvasDomHeight - e.offsetY) / this.canvasDomHeight) *
-            canvas.height;
-        syntheticEvent.$setPosition(x, y);
-        if (this.__currentScene) {
-            let tempVec2 = vec2.create();
-            postOrderTravelNodes(this.__currentScene, node => {
-                if (node instanceof Node2D) {
-                    vec2.set(tempVec2, x, y);
-                    const hitted = node.$hitTest(tempVec2);
-                    if (hitted) {
-                        node.propagateEvent(syntheticEvent);
-                    }
-                    return !hitted;
-                }
-                return true;
-            });
-        }
-    }
-
     public destroy(): void {
         if (!this.__gl) {
             return;
         }
         this.stop();
-        const canvas = this.__gl.canvas;
-        canvas.removeEventListener('click', this.__handleClick as any);
+        if (this.__eventManager) {
+            this.__eventManager.destroy();
+        }
     }
 }
