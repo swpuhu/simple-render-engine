@@ -40,12 +40,12 @@ export class SimpleEngine {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.__gl = gl;
 
-        this.__eventManager = new EventManager(gl.canvas as HTMLCanvasElement);
+        this.__eventManager = EventManager.getInstance();
     }
 
     private __init(): void {
-        if (this.__eventManager) {
-            this.__eventManager.init();
+        if (this.__eventManager && this.__gl) {
+            this.__eventManager.init(this.__gl.canvas as HTMLCanvasElement);
         }
         this.__initialized = true;
     }

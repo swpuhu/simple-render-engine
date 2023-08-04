@@ -4,6 +4,7 @@ import { Event } from './Event';
 import { VertexAssemble2D } from './VertexAssemble2D';
 import { clamp } from './util';
 import { Node2DOptions } from './script/util';
+import { EventManager } from './EventManager';
 
 export class Node2D extends Node {
     private __anchor: vec2 = vec2.fromValues(0.5, 0.5);
@@ -99,5 +100,25 @@ export class Node2D extends Node {
         if (e.allowPropagation) {
             this.parent.propagateEvent(e);
         }
+    }
+
+    public on(
+        event: string | symbol,
+        fn: (...args: any[]) => void,
+        context?: any
+    ): this {
+        const eventManager = EventManager.getInstance();
+        eventManager.on(event, this);
+        super.on(event, fn, context);
+        return this;
+    }
+
+    public off<T extends string | symbol>(
+        event: T,
+        fn: (...args: any[]) => void,
+        context?: any
+    ): this {
+        super.off(event, fn, context);
+        return this;
     }
 }
