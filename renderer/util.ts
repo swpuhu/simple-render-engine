@@ -558,3 +558,8 @@ export function postOrderTravelNodes(
 
     func(node, callback);
 }
+
+export interface Vec2Interface {
+    x: number;
+    y: number;
+}

@@ -20,8 +20,12 @@ export class EventManager {
     private __scene: Scene | null = null;
     private canvas: HTMLCanvasElement | null = null;
     private __eventsMap: Record<string | symbol, Node2D[]> | null = {};
+    private __mouseIsDown = false;
+
     private constructor() {
         this.__handleMouseDown = this.__handleMouseDown.bind(this);
+        this.__handleMouseMove = this.__handleMouseMove.bind(this);
+        this.__handleMouseUp = this.__handleMouseUp.bind(this);
     }
 
     public init(canvas: HTMLCanvasElement): void {
@@ -43,6 +47,16 @@ export class EventManager {
             'mousedown',
             this.__handleMouseDown as EventListener
         );
+
+        this.canvas.addEventListener(
+            'mousemove',
+            this.__handleMouseMove as EventListener
+        );
+
+        this.canvas.addEventListener(
+            'mouseup',
+            this.__handleMouseUp as EventListener
+        );
     }
 
     private __handleMouseEvents(
@@ -63,6 +77,9 @@ export class EventManager {
         if (this.__scene) {
             let tempVec2 = vec2.create();
             const eventNodes = this.__eventsMap[eventName];
+            if (!eventNodes) {
+                return;
+            }
             for (let i = 0; i < eventNodes.length; i++) {
                 const node = eventNodes[i];
                 if (node instanceof Node2D) {
@@ -78,6 +95,7 @@ export class EventManager {
 
     private __handleMouseDown(e: MouseEvent): void {
         this.__touchEvent.eventName = Event.TOUCH_START;
+        this.__mouseIsDown = true;
         this.__handleMouseEvents(
             e,
             this.__touchEvent.eventName,
@@ -90,7 +108,47 @@ export class EventManager {
         );
     }
 
-    private __handleMouseMove(e: MouseEvent): void {}
+    private __handleMouseMove(e: MouseEvent): void {
+        if (!this.__mouseIsDown) {
+            return;
+        }
+        this.__touchEvent.eventName = Event.TOUCHING;
+        const startPos = this.__touchEvent.$getTouchStartPosition();
+        this.__handleMouseEvents(
+            e,
+            this.__touchEvent.eventName,
+            (x: number, y: number) => {
+                const syntheticEvent = this.__touchEvent;
+                const deltaX = x - startPos.x;
+                const deltaY = y - startPos.y;
+                syntheticEvent.$setPosition(x, y);
+                syntheticEvent.$setDelta(deltaX, deltaY);
+                return syntheticEvent;
+            }
+        );
+    }
+
+    private __handleMouseUp(e: MouseEvent): void {
+        if (!this.__mouseIsDown) {
+            return;
+        }
+        this.__touchEvent.eventName = Event.TOUCH_END;
+        const startPos = this.__touchEvent.$getTouchStartPosition();
+        this.__handleMouseEvents(
+            e,
+            this.__touchEvent.eventName,
+            (x: number, y: number) => {
+                const syntheticEvent = this.__touchEvent;
+                const deltaX = x - startPos.x;
+                const deltaY = y - startPos.y;
+                syntheticEvent.$setPosition(x, y);
+                syntheticEvent.$setDelta(deltaX, deltaY);
+                return syntheticEvent;
+            }
+        );
+
+        this.__mouseIsDown = false;
+    }
 
     public destroy(): void {
         if (!this.canvas) {
@@ -99,6 +157,14 @@ export class EventManager {
         this.canvas.removeEventListener(
             'mousedown',
             this.__handleMouseDown as EventListener
+        );
+        this.canvas.removeEventListener(
+            'mousemove',
+            this.__handleMouseMove as EventListener
+        );
+        this.canvas.removeEventListener(
+            'mouseup',
+            this.__handleMouseUp as EventListener
         );
 
         this.__eventsMap = null;
