@@ -23,8 +23,11 @@ export class TouchEvent extends Event {
     private __startPosition: vec2 = vec2.create();
     private __delta: vec2 = vec2.create();
 
-    public get position(): vec2 {
-        return this.__position;
+    public get position(): Vec2Interface {
+        return {
+            x: this.__position[0],
+            y: this.__position[1],
+        };
     }
 
     public get x(): number {

@@ -5,6 +5,7 @@ import { postOrderTravelNodes, travelNode } from './util';
 import { vec2 } from 'gl-matrix';
 import { Node2D } from './Node2D';
 import { EventManager } from './EventManager';
+import { globalEvent } from './GlobalEvent';
 
 export class SimpleEngine {
     private __rfId = -1;
@@ -15,6 +16,8 @@ export class SimpleEngine {
     private __canvasDomHeight = 0;
     private __eventManager: EventManager;
     private __initialized = false;
+
+    private __globalEvent = globalEvent;
 
     public get canvasDomWidth(): number {
         if (this.__canvasDomWidth === 0) {
@@ -115,5 +118,6 @@ export class SimpleEngine {
         if (this.__eventManager) {
             this.__eventManager.destroy();
         }
+        this.__globalEvent.destroy();
     }
 }

@@ -3,6 +3,7 @@ import { Scene } from './Scene';
 import { postOrderTravelNodes } from './util';
 import { Node2D } from './Node2D';
 import { Event, TouchEvent } from './Event';
+import { globalEvent } from './GlobalEvent';
 
 export class EventManager {
     private static __eventManager: EventManager | null = null;
@@ -21,6 +22,7 @@ export class EventManager {
     private canvas: HTMLCanvasElement | null = null;
     private __eventsMap: Record<string | symbol, Node2D[]> | null = {};
     private __mouseIsDown = false;
+    private __globalEvent = globalEvent;
 
     private constructor() {
         this.__handleMouseDown = this.__handleMouseDown.bind(this);
@@ -73,6 +75,13 @@ export class EventManager {
             ((this.__domHeight - nativeEvent.offsetY) / this.__domHeight) *
             this.canvas.height;
         const syntheticEvent = cb(x, y);
+
+        const events = this.__globalEvent.getEventCallback(eventName);
+        if (events) {
+            events.forEach(event => {
+                event.func.call(event.context, syntheticEvent);
+            });
+        }
         // syntheticEvent.$setPosition(x, y);
         if (this.__scene) {
             let tempVec2 = vec2.create();
