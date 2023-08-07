@@ -2,7 +2,7 @@ import { mat4, vec2, vec3 } from 'gl-matrix';
 import { Node } from './Node';
 import { Event } from './Event';
 import { VertexAssemble2D } from './VertexAssemble2D';
-import { clamp } from './util';
+import { Vec2Interface, Vec3Interface, clamp } from './util';
 import { Node2DOptions } from './script/util';
 import { EventManager } from './EventManager';
 
@@ -51,6 +51,13 @@ export class Node2D extends Node {
         this._updateLocalMat();
     }
 
+    public get position(): Vec2Interface {
+        return {
+            x: this.translate.x,
+            y: this.translate.y,
+        };
+    }
+
     constructor(name: string, options?: Node2DOptions) {
         super(name);
         if (options) {
@@ -76,11 +83,15 @@ export class Node2D extends Node {
 
     public $hitTest(pointWorldPos: vec2): boolean {
         vec3.zero(this._tempVec3);
-        const worldPos = this.convertToWorldSpace(this._tempVec3);
-        const wL = worldPos[0] - this.width * this.anchorX;
-        const wR = worldPos[0] + this.width * (1 - this.anchorX);
-        const wB = worldPos[1] - this.height * this.anchorY;
-        const wT = worldPos[1] + this.height * (1 - this.anchorY);
+        const worldPos = this.convertToWorldSpace({
+            x: this._tempVec3[0],
+            y: this._tempVec3[1],
+            z: this._tempVec3[2],
+        });
+        const wL = worldPos.x - this.width * this.anchorX;
+        const wR = worldPos.x + this.width * (1 - this.anchorX);
+        const wB = worldPos.y - this.height * this.anchorY;
+        const wT = worldPos.y + this.height * (1 - this.anchorY);
         if (
             pointWorldPos[0] >= wL &&
             pointWorldPos[0] <= wR &&

@@ -1,9 +1,6 @@
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
-import { Event, TouchEvent } from './Event';
-import { postOrderTravelNodes, travelNode } from './util';
-import { vec2 } from 'gl-matrix';
-import { Node2D } from './Node2D';
+import { travelNode } from './util';
 import { EventManager } from './EventManager';
 import { globalEvent } from './GlobalEvent';
 

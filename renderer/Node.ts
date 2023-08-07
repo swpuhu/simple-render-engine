@@ -3,6 +3,7 @@ import { Mesh } from './Mesh';
 import { EventEmitter } from 'eventemitter3';
 import { EngineScript } from './script/EngineScript';
 import { NodeOptions } from './script/util';
+import { Vec2Interface, Vec3Interface } from './util';
 
 export class Node extends EventEmitter {
     protected _children: Node[] = [];
@@ -20,6 +21,7 @@ export class Node extends EventEmitter {
     protected _tempWorldInvMat: mat4 = mat4.create();
     protected _mesh: Mesh | null = null;
     protected _tempVec3: vec3 = vec3.create();
+
     constructor(public name: string, options?: NodeOptions) {
         super();
     }
@@ -28,7 +30,7 @@ export class Node extends EventEmitter {
         return this._children;
     }
 
-    get parent(): PossibleNullObject<Node> {
+    get parent(): Node | null {
         return this._parent;
     }
 
@@ -60,6 +62,10 @@ export class Node extends EventEmitter {
 
     get mesh(): Mesh | null {
         return this._mesh;
+    }
+
+    public get position(): Vec3Interface | Vec2Interface {
+        return this.translate;
     }
 
     public setParent(parent: Node): void {
@@ -106,20 +112,40 @@ export class Node extends EventEmitter {
     public setMesh(mesh: Mesh): void {
         this._mesh = mesh;
     }
-
-    public convertToWorldSpace(localPos: vec3): vec3 {
+    public convertToWorldSpace(localPos: Vec3Interface): Vec3Interface;
+    public convertToWorldSpace(localPos: Vec2Interface): Vec2Interface;
+    public convertToWorldSpace(
+        localPos: Vec3Interface | Vec2Interface
+    ): Vec3Interface | Vec2Interface {
         const worldMat = this.getWorldMat();
         const worldVec = vec3.create();
-        vec3.transformMat4(worldVec, localPos, worldMat);
-        return worldVec;
+        // @ts-ignore
+        vec3.set(this._tempVec3, localPos.x, localPos.y, localPos.z || 0);
+        vec3.transformMat4(worldVec, this._tempVec3, worldMat);
+        return {
+            x: worldVec[0],
+            y: worldVec[1],
+            z: worldVec[2],
+        };
     }
 
-    public convertToNodeSpace(worldPos: vec3): vec3 {
+    public convertToNodeSpace(worldPos: Vec3Interface): Vec3Interface;
+    public convertToNodeSpace(worldPos: Vec2Interface): Vec2Interface;
+
+    public convertToNodeSpace(
+        worldPos: Vec3Interface | Vec2Interface
+    ): Vec3Interface | Vec2Interface {
         const worldMat = this.getWorldMat();
         mat4.invert(this._tempWorldInvMat, worldMat);
         const localPos = vec3.create();
-        vec3.transformMat4(localPos, worldPos, this._tempWorldInvMat);
-        return localPos;
+        // @ts-ignore
+        vec3.set(this._tempVec3, worldPos.x, worldPos.y, worldPos.z || 0);
+        vec3.transformMat4(localPos, this._tempVec3, this._tempWorldInvMat);
+        return {
+            x: localPos[0],
+            y: localPos[1],
+            z: localPos[2],
+        };
     }
 
     public addScript<T extends EngineScript>(

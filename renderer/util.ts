@@ -564,6 +564,12 @@ export interface Vec2Interface {
     y: number;
 }
 
+export interface Vec3Interface {
+    x: number;
+    y: number;
+    z: number;
+}
+
 export interface SizeInterface {
     width: number;
     height: number;
