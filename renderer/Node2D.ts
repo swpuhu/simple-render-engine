@@ -2,7 +2,7 @@ import { mat4, vec2, vec3 } from 'gl-matrix';
 import { Node } from './Node';
 import { Event } from './Event';
 import { VertexAssemble2D } from './VertexAssemble2D';
-import { Vec2Interface, Vec3Interface, clamp } from './util';
+import { RectInterface, Vec2Interface, Vec3Interface, clamp } from './util';
 import { Node2DOptions } from './script/util';
 import { EventManager } from './EventManager';
 
@@ -131,5 +131,29 @@ export class Node2D extends Node {
     ): this {
         super.off(event, fn, context);
         return this;
+    }
+
+    public getRect(): RectInterface {
+        return {
+            x: -this.width * this.anchorX,
+            y: -this.height * this.anchorY,
+            width: this.width,
+            height: this.height,
+        };
+    }
+
+    public getWorldRect(): RectInterface {
+        const rect = this.getRect();
+        const worldLB = this.convertToWorldSpace({ x: rect.x, y: rect.y });
+        const wolrdRT = this.convertToWorldSpace({
+            x: rect.x + rect.width,
+            y: rect.y + rect.height,
+        });
+        return {
+            x: worldLB.x,
+            y: worldLB.y,
+            width: wolrdRT.x - worldLB.x,
+            height: wolrdRT.y - worldLB.y,
+        };
     }
 }

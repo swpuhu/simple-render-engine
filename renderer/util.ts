@@ -293,9 +293,9 @@ export function lookAt(cameraPos: vec3, targetPos: vec3): mat4 {
 
     // prettier-ignore
     return mat4.fromValues(
-        x[0], x[1], x[2], 0, 
-        y[0], y[1], y[2], 0, 
-        z[0], z[1], z[2], 0, 
+        x[0], x[1], x[2], 0,
+        y[0], y[1], y[2], 0,
+        z[0], z[1], z[2], 0,
         cameraPos[0], cameraPos[1], cameraPos[2], 1
     );
 }
@@ -571,6 +571,13 @@ export interface Vec3Interface {
 }
 
 export interface SizeInterface {
+    width: number;
+    height: number;
+}
+
+export interface RectInterface {
+    x: number;
+    y: number;
     width: number;
     height: number;
 }
