@@ -3,6 +3,7 @@ import { Scene } from './Scene';
 import { travelNode } from './util';
 import { EventManager } from './EventManager';
 import { globalEvent } from './GlobalEvent';
+import EventEmitter from 'eventemitter3';
 
 export class SimpleEngine {
     private __rfId = -1;
@@ -15,6 +16,8 @@ export class SimpleEngine {
     private __initialized = false;
 
     private __globalEvent = globalEvent;
+    private __prevTime = 0;
+    private __eventEmitter = new EventEmitter();
 
     public get canvasDomWidth(): number {
         if (this.__canvasDomWidth === 0) {
@@ -93,10 +96,12 @@ export class SimpleEngine {
         cancelAnimationFrame(this.__rfId);
     }
 
-    private mainLoop(dt: number): void {
+    private mainLoop(time: number): void {
         if (!this.__initialized) {
             this.__init();
         }
+        const dt = time - this.__prevTime;
+        this.__prevTime = time;
         if (this.__currentScene && this.__renderer) {
             travelNode(this.__currentScene, node => {
                 const scripts = node.$scripts;
@@ -116,5 +121,17 @@ export class SimpleEngine {
             this.__eventManager.destroy();
         }
         this.__globalEvent.destroy();
+    }
+
+    public on(
+        event: string,
+        fn: (...args: any[]) => void,
+        context?: any
+    ): void {
+        this.__eventEmitter.on(event, fn, context);
+    }
+
+    public emit(event: string, ...args: any[]): void {
+        this.__eventEmitter.emit(event, args);
     }
 }
