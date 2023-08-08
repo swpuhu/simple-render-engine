@@ -1,10 +1,11 @@
 import { MAX_BUFFER_SIZE, Node2DRenderer } from './Node2DRenderer';
 import { Scene } from './Scene';
+import { SizeInterface } from './util';
 
 export class Renderer {
     private __node2DRenderer: Node2DRenderer | null = null;
-    constructor(private gl: RenderContext) {
-        this.__node2DRenderer = new Node2DRenderer(gl);
+    constructor(private gl: RenderContext, designedSize: SizeInterface) {
+        this.__node2DRenderer = new Node2DRenderer(gl, designedSize);
         gl.clearColor(0.0, 0.0, 0.0, 0.0);
     }
 

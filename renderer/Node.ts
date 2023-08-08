@@ -8,6 +8,7 @@ import { Vec2Interface, Vec3Interface } from './util';
 export class Node extends EventEmitter {
     protected _children: Node[] = [];
     protected _parent: PossibleNullObject<Node> = null;
+    public active = true;
     public $scripts: EngineScript[] = [];
     private __destroyed = false;
     protected translate: { x: number; y: number; z: number } = {

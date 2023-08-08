@@ -13,6 +13,7 @@ export class Scene extends Node {
             if (node.mesh) {
                 meshes.push(node.mesh);
             }
+            return true;
         });
 
         return meshes;
@@ -21,12 +22,14 @@ export class Scene extends Node {
     get2DRenderObject(): RenderScript[] {
         const renderObj: RenderScript[] = [];
         travelNode(this, node => {
-            if (node instanceof Node2D) {
+            if (node.active && node instanceof Node2D) {
                 const renderComp = node.getScript(RenderScript);
                 if (renderComp) {
                     renderObj.push(renderComp);
                 }
             }
+
+            return node.active;
         });
 
         return renderObj;
@@ -38,6 +41,7 @@ export class Scene extends Node {
             if (node instanceof Camera) {
                 cameras.push(node);
             }
+            return true;
         });
         return cameras;
     }

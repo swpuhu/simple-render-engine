@@ -1,12 +1,13 @@
 import { Renderer } from './Renderer';
 import { Scene } from './Scene';
-import { travelNode } from './util';
+import { SizeInterface, travelNode } from './util';
 import { EventManager } from './EventManager';
 import { BEFORE_DRAW_CALL, globalEvent } from './GlobalEvent';
 import EventEmitter from 'eventemitter3';
 
 type EngineOptionType = {
     frameRate?: number;
+    designedSize?: SizeInterface;
 };
 
 const BEFORE_RUN = 'before_run';
@@ -28,6 +29,7 @@ export class SimpleEngine {
     private __prevTime = 0;
     private __eventEmitter = new EventEmitter();
     private __drawCallCount = 0;
+    private __designedSize: SizeInterface = { width: 0, height: 0 };
     public get canvasDomWidth(): number {
         if (this.__canvasDomWidth === 0) {
             const canvas = this.__gl?.canvas as unknown as HTMLCanvasElement;
@@ -46,17 +48,24 @@ export class SimpleEngine {
 
     constructor(gl: WebGL2RenderingContext, options?: EngineOptionType) {
         gl.getExtension('OES_element_index_uint');
-        this.mainLoop = this.mainLoop.bind(this);
-        this.__renderer = new Renderer(gl);
 
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.__gl = gl;
 
+        this.__designedSize = {
+            width: this.__gl.canvas.width,
+            height: this.__gl.canvas.height,
+        };
         if (options) {
             this.__frameRate = options.frameRate || 'auto';
-        }
 
+            if (options.designedSize) {
+                this.__designedSize = options.designedSize;
+            }
+        }
         this.__eventManager = EventManager.getInstance();
+        this.mainLoop = this.mainLoop.bind(this);
+        this.__renderer = new Renderer(gl, this.__designedSize);
     }
 
     private __init(): void {
@@ -101,6 +110,7 @@ export class SimpleEngine {
         travelNode(this.__currentScene, node => {
             const scripts = node.$scripts;
             scripts.forEach(script => script.$init());
+            return true;
         });
     }
 
@@ -129,6 +139,7 @@ export class SimpleEngine {
             travelNode(this.__currentScene, node => {
                 const scripts = node.$scripts;
                 scripts.forEach(script => script.update(dt));
+                return true;
             });
             this.__renderer.render(this.__currentScene);
         }

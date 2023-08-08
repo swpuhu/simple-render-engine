@@ -1,9 +1,9 @@
 import { mat4 } from 'gl-matrix';
 import { DEFAULT_VERT_POS_NAME, DEFAULT_VERT_UV_NAME } from './Enum';
 import { Material } from './Material';
-import { Node2D } from './Node2D';
 import { RenderScript } from './script/RenderScript';
 import { BEFORE_DRAW_CALL, globalEvent } from './GlobalEvent';
+import { SizeInterface } from './util';
 
 export const MAX_BUFFER_SIZE = 65000;
 
@@ -49,7 +49,10 @@ export class Node2DRenderer {
         this.__indexOffset = v;
     }
 
-    constructor(private gl: RenderContext) {
+    constructor(
+        private gl: RenderContext,
+        private designedSize: SizeInterface
+    ) {
         this.__posBufferView = new Float32Array(MAX_BUFFER_SIZE);
         this.__uvBufferView = new Float32Array(MAX_BUFFER_SIZE);
         this.__indexBufferView = new Uint32Array(MAX_BUFFER_SIZE);
@@ -86,9 +89,9 @@ export class Node2DRenderer {
         return mat4.ortho(
             this.__projMat,
             0,
-            this.gl.canvas.width,
+            this.designedSize.width,
             0,
-            this.gl.canvas.height,
+            this.designedSize.height,
             -100,
             100
         );
@@ -168,6 +171,11 @@ export class Node2DRenderer {
         );
         this.__offset = newOffset;
         this.__indexOffset = newIndexOffset;
+    }
+
+    public updateDesignedSize(size: SizeInterface) {
+        this.designedSize = size;
+        this.__projMat = this.__getProjMatrix();
     }
 
     public batchRender(): void {

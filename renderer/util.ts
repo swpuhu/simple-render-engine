@@ -1,9 +1,14 @@
 import { Node } from './Node';
 import { mat4, vec3 } from 'gl-matrix';
 
-export function travelNode(node: Node, callback?: (node: Node) => void): void {
-    callback && callback(node);
-    node.children.forEach(item => travelNode(item, callback));
+export function travelNode(
+    node: Node,
+    callback: (node: Node) => boolean
+): void {
+    const result = callback(node);
+    if (result) {
+        node.children.forEach(item => travelNode(item, callback));
+    }
 }
 
 function createShader(gl: WebGLRenderingContext, type: number, source: string) {
