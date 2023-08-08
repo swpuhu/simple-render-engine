@@ -564,6 +564,17 @@ export function postOrderTravelNodes(
     func(node, callback);
 }
 
+export function isActive(node: Node | null) {
+    if (!node) {
+        return true;
+    }
+    if (!node.active) {
+        return false;
+    }
+
+    return isActive(node.parent);
+}
+
 export interface Vec2Interface {
     x: number;
     y: number;

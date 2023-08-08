@@ -1,6 +1,6 @@
 import { vec2 } from 'gl-matrix';
 import { Scene } from './Scene';
-import { postOrderTravelNodes } from './util';
+import { isActive, postOrderTravelNodes } from './util';
 import { Node2D } from './Node2D';
 import { Event, TouchEvent } from './Event';
 import { globalEvent } from './GlobalEvent';
@@ -91,7 +91,7 @@ export class EventManager {
             }
             for (let i = 0; i < eventNodes.length; i++) {
                 const node = eventNodes[i];
-                if (node instanceof Node2D) {
+                if (node instanceof Node2D && isActive(node)) {
                     vec2.set(tempVec2, x, y);
                     const hitted = node.$hitTest(tempVec2);
                     if (hitted) {

@@ -78,6 +78,9 @@ export class Node extends EventEmitter {
 
     public addChildren(...nodes: Node[]): void {
         for (let i = 0; i < nodes.length; i++) {
+            if (nodes[i].parent) {
+                throw new Error('the node has parent already!');
+            }
             nodes[i].setParent(this);
         }
     }
