@@ -1,7 +1,9 @@
+import EventEmitter from 'eventemitter3';
 import { Node } from '../Node';
 
 export class EngineScript {
     private __initialized = false;
+    private __eventEmitter = new EventEmitter();
     public constructor(public node: Node) {}
 
     public $init(): void {
@@ -34,5 +36,25 @@ export class EngineScript {
 
     public destroy(): void {
         this.onDestroy();
+        this.__eventEmitter.removeAllListeners();
+    }
+    public on(
+        event: string,
+        fn: (...args: any[]) => void,
+        context?: any
+    ): void {
+        this.__eventEmitter.on(event, fn, context);
+    }
+
+    public off(
+        event: string,
+        fn: (...args: any[]) => void,
+        context?: any
+    ): void {
+        this.__eventEmitter.off(event, fn, context);
+    }
+
+    public emit(event: string, ...args: any[]): void {
+        this.__eventEmitter.emit(event, ...args);
     }
 }

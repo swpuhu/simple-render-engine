@@ -22,7 +22,11 @@ export class Scene extends Node {
     get2DRenderObject(): RenderScript[] {
         const renderObj: RenderScript[] = [];
         travelNode(this, node => {
-            if (node.active && node instanceof Node2D) {
+            if (
+                node.active &&
+                node instanceof Node2D &&
+                (node.width !== 0 || node.height !== 0)
+            ) {
                 const renderComp = node.getScript(RenderScript);
                 if (renderComp) {
                     renderObj.push(renderComp);

@@ -4,6 +4,7 @@ import { EventEmitter } from 'eventemitter3';
 import { EngineScript } from './script/EngineScript';
 import { NodeOptions } from './script/util';
 import { Vec2Interface, Vec3Interface } from './util';
+import { RenderScript } from './script/RenderScript';
 
 export class Node extends EventEmitter {
     protected _children: Node[] = [];
@@ -153,6 +154,14 @@ export class Node extends EventEmitter {
         scriptCtor: new (node: Node) => T
     ): T {
         const s = new scriptCtor(this);
+        if (
+            s instanceof RenderScript &&
+            this.$scripts.some(item => item instanceof RenderScript)
+        ) {
+            throw new Error(
+                'Only one RenderScript was allowed to add in node.'
+            );
+        }
         this.$scripts.push(s);
         s.load();
         return s;

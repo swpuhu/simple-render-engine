@@ -586,3 +586,10 @@ export interface RectInterface {
     width: number;
     height: number;
 }
+
+export interface ClippingInfoInterface {
+    left: number;
+    right: number;
+    top: number;
+    bottom: number;
+}

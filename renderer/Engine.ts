@@ -4,6 +4,7 @@ import { SizeInterface, travelNode } from './util';
 import { EventManager } from './EventManager';
 import { BEFORE_DRAW_CALL, globalEvent } from './GlobalEvent';
 import EventEmitter from 'eventemitter3';
+import { View } from './View';
 
 type EngineOptionType = {
     frameRate?: number;
@@ -24,12 +25,12 @@ export class SimpleEngine {
     private __eventManager: EventManager;
     private __initialized = false;
     private __frameRate: 'auto' | number = 'auto';
+    private __view: View = View.getInstance();
 
     private __globalEvent = globalEvent;
     private __prevTime = 0;
     private __eventEmitter = new EventEmitter();
     private __drawCallCount = 0;
-    private __designedSize: SizeInterface = { width: 0, height: 0 };
     public get canvasDomWidth(): number {
         if (this.__canvasDomWidth === 0) {
             const canvas = this.__gl?.canvas as unknown as HTMLCanvasElement;
@@ -52,20 +53,20 @@ export class SimpleEngine {
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.__gl = gl;
 
-        this.__designedSize = {
+        this.__view.setDesignedSize({
             width: this.__gl.canvas.width,
             height: this.__gl.canvas.height,
-        };
+        });
         if (options) {
             this.__frameRate = options.frameRate || 'auto';
 
             if (options.designedSize) {
-                this.__designedSize = options.designedSize;
+                this.__view.setDesignedSize(options.designedSize);
             }
         }
         this.__eventManager = EventManager.getInstance();
         this.mainLoop = this.mainLoop.bind(this);
-        this.__renderer = new Renderer(gl, this.__designedSize);
+        this.__renderer = new Renderer(gl, this.__view.getDesignedSize());
     }
 
     private __init(): void {

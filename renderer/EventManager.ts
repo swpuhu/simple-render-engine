@@ -175,8 +175,6 @@ export class EventManager {
             'mouseup',
             this.__handleMouseUp as EventListener
         );
-
-        this.__eventsMap = null;
     }
 
     public on(eventName: string | symbol, node: Node2D) {
