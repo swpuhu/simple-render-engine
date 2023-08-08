@@ -603,4 +603,5 @@ export interface ClippingInfoInterface {
     right: number;
     top: number;
     bottom: number;
+    aspect: number | 'free';
 }
