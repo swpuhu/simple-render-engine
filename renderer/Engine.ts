@@ -2,10 +2,18 @@ import { Renderer } from './Renderer';
 import { Scene } from './Scene';
 import { travelNode } from './util';
 import { EventManager } from './EventManager';
-import { globalEvent } from './GlobalEvent';
+import { BEFORE_DRAW_CALL, globalEvent } from './GlobalEvent';
 import EventEmitter from 'eventemitter3';
 
+type EngineOptionType = {
+    frameRate?: number;
+};
+
+const BEFORE_RUN = 'before_run';
+const UPDATE_DRAW_CALL = 'update_draw_call';
 export class SimpleEngine {
+    static BEFORE_RUN: typeof BEFORE_RUN = BEFORE_RUN;
+    static UPDATE_DRAW_CALL: typeof UPDATE_DRAW_CALL = UPDATE_DRAW_CALL;
     private __rfId = -1;
     private __currentScene: Scene | null = null;
     private __renderer: Renderer | null = null;
@@ -14,11 +22,12 @@ export class SimpleEngine {
     private __canvasDomHeight = 0;
     private __eventManager: EventManager;
     private __initialized = false;
+    private __frameRate: 'auto' | number = 'auto';
 
     private __globalEvent = globalEvent;
     private __prevTime = 0;
     private __eventEmitter = new EventEmitter();
-
+    private __drawCallCount = 0;
     public get canvasDomWidth(): number {
         if (this.__canvasDomWidth === 0) {
             const canvas = this.__gl?.canvas as unknown as HTMLCanvasElement;
@@ -35,13 +44,17 @@ export class SimpleEngine {
         return this.__canvasDomHeight;
     }
 
-    constructor(gl: WebGL2RenderingContext) {
+    constructor(gl: WebGL2RenderingContext, options?: EngineOptionType) {
         gl.getExtension('OES_element_index_uint');
         this.mainLoop = this.mainLoop.bind(this);
         this.__renderer = new Renderer(gl);
 
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.__gl = gl;
+
+        if (options) {
+            this.__frameRate = options.frameRate || 'auto';
+        }
 
         this.__eventManager = EventManager.getInstance();
     }
@@ -50,6 +63,10 @@ export class SimpleEngine {
         if (this.__eventManager && this.__gl) {
             this.__eventManager.init(this.__gl.canvas as HTMLCanvasElement);
         }
+        this.__globalEvent.on(BEFORE_DRAW_CALL, () => {
+            this.__drawCallCount++;
+            this.emit(UPDATE_DRAW_CALL, this.__drawCallCount);
+        });
         this.__initialized = true;
     }
 
@@ -89,19 +106,25 @@ export class SimpleEngine {
 
     run(): void {
         this.__loadScript();
-        this.mainLoop(0);
+        this.__prevTime = Date.now();
+        this.mainLoop();
     }
 
     stop(): void {
         cancelAnimationFrame(this.__rfId);
+        clearTimeout(this.__rfId);
     }
 
-    private mainLoop(time: number): void {
+    private mainLoop(): void {
         if (!this.__initialized) {
             this.__init();
         }
+        const time = Date.now();
         const dt = time - this.__prevTime;
         this.__prevTime = time;
+        this.__drawCallCount = 0;
+        const frameRate = dt === 0 ? dt : Math.round(100000 / dt) / 100;
+        this.emit(SimpleEngine.BEFORE_RUN, frameRate);
         if (this.__currentScene && this.__renderer) {
             travelNode(this.__currentScene, node => {
                 const scripts = node.$scripts;
@@ -109,7 +132,12 @@ export class SimpleEngine {
             });
             this.__renderer.render(this.__currentScene);
         }
-        this.__rfId = requestAnimationFrame(this.mainLoop);
+        if (this.__frameRate === 'auto') {
+            this.__rfId = requestAnimationFrame(this.mainLoop);
+        } else {
+            // @ts-ignore
+            this.__rfId = setTimeout(this.mainLoop, 1000 / this.__frameRate);
+        }
     }
 
     public destroy(): void {
@@ -117,6 +145,7 @@ export class SimpleEngine {
             return;
         }
         this.stop();
+        this.__eventEmitter.removeAllListeners();
         if (this.__eventManager) {
             this.__eventManager.destroy();
         }
@@ -132,6 +161,6 @@ export class SimpleEngine {
     }
 
     public emit(event: string, ...args: any[]): void {
-        this.__eventEmitter.emit(event, args);
+        this.__eventEmitter.emit(event, ...args);
     }
 }

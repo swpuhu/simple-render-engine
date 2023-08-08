@@ -3,6 +3,7 @@ import { DEFAULT_VERT_POS_NAME, DEFAULT_VERT_UV_NAME } from './Enum';
 import { Material } from './Material';
 import { Node2D } from './Node2D';
 import { RenderScript } from './script/RenderScript';
+import { BEFORE_DRAW_CALL, globalEvent } from './GlobalEvent';
 
 export const MAX_BUFFER_SIZE = 65000;
 
@@ -19,6 +20,7 @@ export class Node2DRenderer {
     private __indexOffset = 0;
     private __currentMaterial: Material | null = null;
     private __projMat: mat4 = mat4.create();
+    private __globalEventManager = globalEvent;
 
     public get posBufferView(): Float32Array {
         return this.__posBufferView;
@@ -183,6 +185,7 @@ export class Node2DRenderer {
         this.__bindMaterialParams();
         const vertexCount = this.__indexOffset;
         gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+        this.__globalEventManager.emit(BEFORE_DRAW_CALL);
         this.__offset = 0;
         this.__indexOffset = 0;
         this.__currentMaterial = null;

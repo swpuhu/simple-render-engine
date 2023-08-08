@@ -15,6 +15,16 @@ export const globalEvent = {
             context: context,
         });
     },
+
+    emit(event: string, ...args: any[]) {
+        if (!__eventMap[event]) {
+            return;
+        }
+
+        __eventMap[event].forEach(func => {
+            func.func.call(func.context, ...args);
+        });
+    },
     off(event: string, fn: (...args: any[]) => void, context?: any) {
         if (!__eventMap[event]) {
             return;
@@ -36,3 +46,5 @@ export const globalEvent = {
         __eventMap = {};
     },
 };
+
+export const BEFORE_DRAW_CALL = 'before_draw_call';

@@ -1,5 +1,6 @@
 import { Camera } from './Camera';
 import { Geometry } from './Geometry';
+import { BEFORE_DRAW_CALL, globalEvent } from './GlobalEvent';
 import { Material } from './Material';
 import { Node } from './Node';
 import { Node2D } from './Node2D';
@@ -18,6 +19,7 @@ export class Mesh {
     private uvBuffer: WebGLBuffer | null = null;
     private _dataUploaded = false;
     private __gl: RenderContext | null = null;
+    private __globalEventManager = globalEvent;
     constructor(
         protected _geometry: Geometry,
         protected _material: Material,
@@ -165,7 +167,11 @@ export class Mesh {
     private bindCameraParams(camera: Camera): void {
         const projMat = camera.getProjMat();
         const viewInvMat = camera.getViewInvMat();
-        const worldPos = camera.convertToWorldSpace([0, 0, 0]);
+        const worldPos = camera.convertToWorldSpace({
+            x: 0,
+            y: 0,
+            z: 0,
+        });
 
         this._material.setProperty(BUILT_IN_PROJ, projMat);
         this._material.setProperty(BUILT_IN_VIEW_INV, viewInvMat);
@@ -194,6 +200,7 @@ export class Mesh {
         this.bindMaterialParams(gl);
 
         const vertexCount = this._geometry.count;
+        this.__globalEventManager.emit(BEFORE_DRAW_CALL);
         gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
     }
 
