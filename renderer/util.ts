@@ -1,5 +1,6 @@
 import { Node } from './Node';
 import { mat4, vec3 } from 'gl-matrix';
+import { AspectType } from './script/util';
 
 export function travelNode(
     node: Node,
@@ -603,5 +604,5 @@ export interface ClippingInfoInterface {
     right: number;
     top: number;
     bottom: number;
-    aspect: number | 'free';
+    aspect: AspectType;
 }

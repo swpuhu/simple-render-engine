@@ -9,6 +9,8 @@ export type NodeOptions = {
     y?: number;
 };
 
+export type AspectType = number | 'free';
+
 export type Node2DOptions = {
     anchorX?: number;
     anchorY?: number;
