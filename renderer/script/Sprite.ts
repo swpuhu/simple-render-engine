@@ -1,4 +1,5 @@
 import { Texture } from '../Texture';
+import { TextureCache } from '../TextureCache';
 import { VertexAssemble2D } from '../VertexAssemble2D';
 import { SpriteDefaultMaterial } from '../material/SpriteDefaultMaterial';
 import { RenderScript } from './RenderScript';
@@ -22,14 +23,15 @@ export class Sprite extends RenderScript {
     public onInit(): void {
         this.__texture = new Texture();
         this.assembler = new VertexAssemble2D(this.node);
-        this.material = new SpriteDefaultMaterial(this.__texture);
+        this.material = new SpriteDefaultMaterial();
     }
 
     public async setURL(url: string): Promise<void> {
-        if (!this.__texture) {
-            return;
+        const texture = await TextureCache.getTexture(url);
+        if (texture) {
+            this.__texture = texture;
+            this.material?.setProperty('u_tex', this.__texture);
         }
-        return this.__texture.loadTexture(url);
     }
 
     protected onDestroy(): void {

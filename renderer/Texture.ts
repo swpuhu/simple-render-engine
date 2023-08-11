@@ -1,3 +1,5 @@
+import { TextureCache } from './TextureCache';
+import { engineGlobal } from './engineGlobal';
 import { createTexture, loadImage } from './util';
 
 export class Texture {
@@ -42,8 +44,10 @@ export class Texture {
     }
 
     constructor(private __imgData?: TexImageSource) {
-        if (__imgData instanceof HTMLImageElement) {
+        if (!engineGlobal.context) {
+            throw new Error('Must firstly initialize engine!');
         }
+        this.createTexture(engineGlobal.context);
     }
 
     public createTexture(gl: RenderContext) {
@@ -87,6 +91,15 @@ export class Texture {
     }
 
     public async loadTexture(src: string): Promise<void> {
+        const textureIndex = TextureCache.getAllTextures().indexOf(this);
+        if (textureIndex < 0) {
+            TextureCache.setTexture(src, this);
+        } else {
+            const prevSrc = TextureCache.getUrlByTexture(this);
+            if (prevSrc) {
+                TextureCache.updateTextureUrl(this, prevSrc, src);
+            }
+        }
         const img = await loadImage(src, this.__tempImg);
         this.__imgData = img;
 
@@ -97,6 +110,7 @@ export class Texture {
         if (this.__gl && !this.__destroyed) {
             this.__gl.deleteTexture(this.texture);
             this.__destroyed = true;
+            TextureCache.removeTexture(this);
         }
     }
 }

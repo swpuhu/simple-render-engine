@@ -5,6 +5,7 @@ import { EventManager } from './EventManager';
 import { BEFORE_DRAW_CALL, globalEvent } from './GlobalEvent';
 import EventEmitter from 'eventemitter3';
 import { View } from './View';
+import { engineGlobal } from './engineGlobal';
 
 type EngineOptionType = {
     frameRate?: number;
@@ -49,7 +50,6 @@ export class SimpleEngine {
 
     constructor(gl: WebGL2RenderingContext, options?: EngineOptionType) {
         gl.getExtension('OES_element_index_uint');
-
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         this.__gl = gl;
 
@@ -67,17 +67,24 @@ export class SimpleEngine {
         this.__eventManager = EventManager.getInstance();
         this.mainLoop = this.mainLoop.bind(this);
         this.__renderer = new Renderer(gl, this.__view.getDesignedSize());
+
+        this.__init();
     }
 
     private __init(): void {
         if (this.__eventManager && this.__gl) {
             this.__eventManager.init(this.__gl.canvas as HTMLCanvasElement);
         }
+        this.__initEngineGlobalVariables();
         this.__globalEvent.on(BEFORE_DRAW_CALL, () => {
             this.__drawCallCount++;
             this.emit(UPDATE_DRAW_CALL, this.__drawCallCount);
         });
         this.__initialized = true;
+    }
+
+    private __initEngineGlobalVariables(): void {
+        engineGlobal.context = this.__gl;
     }
 
     setViewSize(width: number, height: number): void {
