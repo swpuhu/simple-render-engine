@@ -141,11 +141,13 @@ export class Effect {
         return -1;
     }
 
-    public setProperty(name: string, value: any): void {
+    public setProperty(name: string, value: any, passIndex: number): void {
         if (value === void 0 || value === null) {
             return;
         }
-        const uniform = this.uniformsMap.find(item => item.name === name);
+        const uniform = this.uniformsMap.find(
+            item => item.name === name && item.programIndex === passIndex
+        );
         if (!uniform) {
             return;
         }

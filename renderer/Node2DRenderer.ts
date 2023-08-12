@@ -150,7 +150,7 @@ export class Node2DRenderer {
         this.__currentMaterial.setPipelineState(gl, passIndex);
 
         this.__currentMaterial.setProperty('u_proj', this.__projMat);
-        this.__currentMaterial.setProperties();
+        this.__currentMaterial.setProperties(passIndex);
     }
 
     public render(renderScript: RenderScript) {
@@ -196,6 +196,7 @@ export class Node2DRenderer {
 
         this.__updateData();
         for (let i = 0; i < this.__currentMaterial.effect.passes; i++) {
+            this.__currentMaterial.use(i);
             this.__bindVertexInfo(i);
             this.__bindMaterialParams(i);
             const vertexCount = this.__indexOffset;

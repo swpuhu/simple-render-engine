@@ -16,10 +16,10 @@ export class Material {
         }
     }
 
-    public setProperties(): void {
+    public setProperties(passIndex = 0): void {
         for (let i = 0; i < this.properties.length; i++) {
             const prop = this.properties[i];
-            this.effect.setProperty(prop.name, prop.value);
+            this.effect.setProperty(prop.name, prop.value, passIndex);
         }
     }
 
