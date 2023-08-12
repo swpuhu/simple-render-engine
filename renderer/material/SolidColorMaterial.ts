@@ -8,7 +8,7 @@ import { MaterialPropertyEnum } from '../type';
 
 export class SolidColorMaterial extends Material {
     constructor() {
-        const unlitEffect = new Effect(vert, frag);
+        const unlitEffect = new Effect([{ vert, frag }]);
         super(
             unlitEffect,
             [

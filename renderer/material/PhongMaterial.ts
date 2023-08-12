@@ -6,7 +6,7 @@ import { MaterialPropertyEnum } from '../type';
 
 export class PhongMaterial extends Material {
     constructor(diffuse = [0.5, 0.5, 0.5], specular = [1, 1, 1]) {
-        const phongEffect = new Effect(vert, frag);
+        const phongEffect = new Effect([{ vert, frag }]);
         super(
             phongEffect,
             [

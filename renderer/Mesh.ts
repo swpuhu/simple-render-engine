@@ -135,7 +135,7 @@ export class Mesh {
     private bindVertexInfo(gl: RenderContext): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         let vertName = this._geometry.vertAttrib.positions.name;
-        let layoutIndex = this._material.effect.attribs[vertName];
+        let layoutIndex = this._material.effect.getAttribLayoutIndex(vertName);
         if (layoutIndex !== void 0) {
             gl.vertexAttribPointer(layoutIndex, 3, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(layoutIndex);
@@ -144,7 +144,7 @@ export class Mesh {
         if (this._geometry.hasNormal()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
             vertName = this._geometry.vertAttrib.normals!.name;
-            layoutIndex = this._material.effect.attribs[vertName];
+            layoutIndex = this._material.effect.getAttribLayoutIndex(vertName);
             if (layoutIndex !== void 0) {
                 gl.vertexAttribPointer(layoutIndex, 3, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(layoutIndex);
@@ -154,7 +154,7 @@ export class Mesh {
         if (this._geometry.hasUV()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
             vertName = this._geometry.vertAttrib.uvs!.name;
-            layoutIndex = this._material.effect.attribs[vertName];
+            layoutIndex = this._material.effect.getAttribLayoutIndex(vertName);
             if (layoutIndex !== void 0) {
                 gl.vertexAttribPointer(layoutIndex, 2, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(layoutIndex);

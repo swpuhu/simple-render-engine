@@ -3,72 +3,11 @@ import { Effect } from './Effect';
 import { MaterialPropertyType, PipeLineStateType } from './type';
 import { BlendFactor } from './Macro';
 
-const defaultPipelineConfig: PipeLineStateType = {
-    cullMode: 'back',
-    depthStencilState: {
-        depthTest: true,
-        depthWrite: true,
-    },
-    blendState: {
-        blend: false,
-        blendSrc: BlendFactor.SRC_ALPHA,
-        blendDst: BlendFactor.ONE_MINUS_SRC_ALPHA,
-    },
-};
 export class Material {
     constructor(
         public effect: Effect,
-        protected properties: MaterialPropertyType[] = [],
-        protected pipelineState: Partial<PipeLineStateType> = {}
-    ) {
-        if (this.pipelineState) {
-            this.pipelineState = _.merge(
-                defaultPipelineConfig,
-                this.pipelineState
-            );
-        }
-    }
-
-    get program(): PossibleNullObject<WebGLProgram> {
-        return this.effect.program;
-    }
-
-    public setPipelineState(gl: RenderContext): void {
-        if (this.pipelineState.cullMode === 'none') {
-            gl.disable(gl.CULL_FACE);
-        } else {
-            gl.enable(gl.CULL_FACE);
-            if (this.pipelineState.cullMode === 'back') {
-                gl.cullFace(gl.BACK);
-            } else {
-                gl.cullFace(gl.FRONT);
-            }
-        }
-
-        if (this.pipelineState.depthStencilState!.depthTest) {
-            gl.enable(gl.DEPTH_TEST);
-            if (this.pipelineState.depthStencilState?.depthFunc !== void 0) {
-                gl.depthFunc(this.pipelineState.depthStencilState?.depthFunc);
-            }
-        } else {
-            gl.disable(gl.DEPTH_TEST);
-        }
-        if (this.pipelineState.depthStencilState!.depthWrite) {
-            gl.depthMask(true);
-        } else {
-            gl.depthMask(false);
-        }
-
-        if (this.pipelineState.blendState!.blend) {
-            gl.enable(gl.BLEND);
-            gl.blendFunc(
-                this.pipelineState.blendState!.blendSrc,
-                this.pipelineState.blendState!.blendDst
-            );
-        } else {
-            gl.disable(gl.BLEND);
-        }
-    }
+        protected properties: MaterialPropertyType[] = []
+    ) {}
 
     public setProperty(name: string, value: any): void {
         const prop = this.properties.find(item => item.name === name);
@@ -84,8 +23,12 @@ export class Material {
         }
     }
 
-    public use(): void {
-        this.effect.use();
+    public setPipelineState(gl: RenderContext, passIndex: number): void {
+        this.effect.setPipelineState(gl, passIndex);
+    }
+
+    public use(passIndex: number): void {
+        this.effect.use(passIndex);
     }
 
     public destroy(): void {

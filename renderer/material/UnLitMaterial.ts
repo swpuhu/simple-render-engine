@@ -8,7 +8,7 @@ import { MaterialPropertyEnum } from '../type';
 
 export class UnLitMaterial extends Material {
     constructor(texture?: Texture) {
-        const unlitEffect = new Effect(vert, frag);
+        const unlitEffect = new Effect([{ vert, frag }]);
         super(
             unlitEffect,
             [

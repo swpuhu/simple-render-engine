@@ -27,7 +27,12 @@ export function main() {
     });
     const geo1 = Geometry.getCube();
     const geo2 = Geometry.getQuad();
-    const effect1 = new Effect(vert, frag);
+    const effect1 = new Effect([
+        {
+            vert: vert,
+            frag: frag,
+        },
+    ]);
     const material1 = new Material(
         effect1,
         [

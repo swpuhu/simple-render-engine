@@ -110,7 +110,7 @@ export class Node2DRenderer {
         gl.bufferSubData(gl.ELEMENT_ARRAY_BUFFER, 0, this.__indexBufferView);
     }
 
-    private __bindVertexInfo(): void {
+    private __bindVertexInfo(passIndex: number): void {
         if (!this.__currentMaterial) {
             return;
         }
@@ -119,14 +119,20 @@ export class Node2DRenderer {
         const vertPosName = DEFAULT_VERT_POS_NAME;
         const vertUVName = DEFAULT_VERT_UV_NAME;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.__posBuffer);
-        let layoutIndex = this.__currentMaterial.effect.attribs[vertPosName];
+        let layoutIndex = this.__currentMaterial.effect.getAttribLayoutIndex(
+            vertPosName,
+            passIndex
+        );
         if (layoutIndex !== void 0) {
             gl.vertexAttribPointer(layoutIndex, 3, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(layoutIndex);
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.__uvBuffer);
-        layoutIndex = this.__currentMaterial.effect.attribs[vertUVName];
+        layoutIndex = this.__currentMaterial.effect.getAttribLayoutIndex(
+            vertUVName,
+            passIndex
+        );
         if (layoutIndex !== void 0) {
             gl.vertexAttribPointer(layoutIndex, 2, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(layoutIndex);
@@ -135,13 +141,13 @@ export class Node2DRenderer {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.__indexBuffer);
     }
 
-    private __bindMaterialParams(): void {
+    private __bindMaterialParams(passIndex: number): void {
         const gl = this.gl;
         if (!this.__currentMaterial) {
             return;
         }
-        this.__currentMaterial.use();
-        this.__currentMaterial.setPipelineState(gl);
+        this.__currentMaterial.use(passIndex);
+        this.__currentMaterial.setPipelineState(gl, passIndex);
 
         this.__currentMaterial.setProperty('u_proj', this.__projMat);
         this.__currentMaterial.setProperties();
@@ -189,11 +195,13 @@ export class Node2DRenderer {
         }
 
         this.__updateData();
-        this.__bindVertexInfo();
-        this.__bindMaterialParams();
-        const vertexCount = this.__indexOffset;
-        gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
-        this.__globalEventManager.emit(BEFORE_DRAW_CALL);
+        for (let i = 0; i < this.__currentMaterial.effect.passes; i++) {
+            this.__bindVertexInfo(i);
+            this.__bindMaterialParams(i);
+            const vertexCount = this.__indexOffset;
+            this.__globalEventManager.emit(BEFORE_DRAW_CALL);
+            gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+        }
         this.__offset = 0;
         this.__indexOffset = 0;
         this.__currentMaterial = null;

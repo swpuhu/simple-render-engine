@@ -8,7 +8,12 @@ import { MaterialPropertyEnum } from '../type';
 
 export class GridBackgroundMaterial extends Material {
     constructor() {
-        const unlitEffect = new Effect(vert, frag);
+        const unlitEffect = new Effect([
+            {
+                vert,
+                frag,
+            },
+        ]);
         super(
             unlitEffect,
             [
