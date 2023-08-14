@@ -122,20 +122,23 @@ export class Mesh {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     }
 
-    private bindMaterialParams(gl: RenderContext): void {
+    private bindMaterialParams(gl: RenderContext, passIndex: number): void {
         if (!gl) {
             return;
         }
-        this._material.setPipelineState(gl);
+        this._material.setPipelineState(gl, passIndex);
 
         this._material.setProperty('u_world', this._node.getWorldMat());
-        this._material.setProperties();
+        this._material.setProperties(passIndex);
     }
 
-    private bindVertexInfo(gl: RenderContext): void {
+    private bindVertexInfo(gl: RenderContext, passIndex: number): void {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         let vertName = this._geometry.vertAttrib.positions.name;
-        let layoutIndex = this._material.effect.getAttribLayoutIndex(vertName);
+        let layoutIndex = this._material.effect.getAttribLayoutIndex(
+            vertName,
+            passIndex
+        );
         if (layoutIndex !== void 0) {
             gl.vertexAttribPointer(layoutIndex, 3, gl.FLOAT, false, 0, 0);
             gl.enableVertexAttribArray(layoutIndex);
@@ -144,7 +147,10 @@ export class Mesh {
         if (this._geometry.hasNormal()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
             vertName = this._geometry.vertAttrib.normals!.name;
-            layoutIndex = this._material.effect.getAttribLayoutIndex(vertName);
+            layoutIndex = this._material.effect.getAttribLayoutIndex(
+                vertName,
+                passIndex
+            );
             if (layoutIndex !== void 0) {
                 gl.vertexAttribPointer(layoutIndex, 3, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(layoutIndex);
@@ -154,7 +160,10 @@ export class Mesh {
         if (this._geometry.hasUV()) {
             gl.bindBuffer(gl.ARRAY_BUFFER, this.uvBuffer);
             vertName = this._geometry.vertAttrib.uvs!.name;
-            layoutIndex = this._material.effect.getAttribLayoutIndex(vertName);
+            layoutIndex = this._material.effect.getAttribLayoutIndex(
+                vertName,
+                passIndex
+            );
             if (layoutIndex !== void 0) {
                 gl.vertexAttribPointer(layoutIndex, 2, gl.FLOAT, false, 0, 0);
                 gl.enableVertexAttribArray(layoutIndex);
@@ -181,8 +190,6 @@ export class Mesh {
     }
 
     public render(gl: RenderContext, camera: Camera): void {
-        this._material.use();
-
         if (!this.dataUploaded) {
             this.__uploadData(gl);
         } else {
@@ -193,15 +200,15 @@ export class Mesh {
             this._material.effect.compile(gl);
         }
 
-        this.bindVertexInfo(gl);
-
-        this.bindCameraParams(camera);
-
-        this.bindMaterialParams(gl);
-
-        const vertexCount = this._geometry.count;
-        this.__globalEventManager.emit(BEFORE_DRAW_CALL);
-        gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+        for (let i = 0; i < this._material.effect.passes; i++) {
+            this._material.use(i);
+            this.bindVertexInfo(gl, i);
+            this.bindCameraParams(camera);
+            this.bindMaterialParams(gl, i);
+            const vertexCount = this._geometry.count;
+            this.__globalEventManager.emit(BEFORE_DRAW_CALL);
+            gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_INT, 0);
+        }
     }
 
     public destroy(): void {

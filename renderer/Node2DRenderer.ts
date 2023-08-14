@@ -146,7 +146,6 @@ export class Node2DRenderer {
         if (!this.__currentMaterial) {
             return;
         }
-        this.__currentMaterial.use(passIndex);
         this.__currentMaterial.setPipelineState(gl, passIndex);
 
         this.__currentMaterial.setProperty('u_proj', this.__projMat);
