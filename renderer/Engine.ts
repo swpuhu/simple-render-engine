@@ -9,7 +9,7 @@ export class SimpleEngine {
     private __rfId = -1;
     private __currentScene: Scene | null = null;
     private __renderer: Renderer | null = null;
-    private __gl: WebGL2RenderingContext | null = null;
+    private __gl: WebGL2RenderingContext | WebGLRenderingContext | null = null;
     private __canvasDomWidth = 0;
     private __canvasDomHeight = 0;
 
@@ -29,7 +29,7 @@ export class SimpleEngine {
         return this.__canvasDomHeight;
     }
 
-    constructor(gl: WebGL2RenderingContext) {
+    constructor(gl: WebGL2RenderingContext | WebGLRenderingContext) {
         gl.getExtension('OES_element_index_uint');
         this.mainLoop = this.mainLoop.bind(this);
         this.__renderer = new Renderer(gl);

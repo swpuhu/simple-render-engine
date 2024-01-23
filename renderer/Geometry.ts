@@ -1,4 +1,4 @@
-import { cloneDeep } from 'lodash';
+import * as _ from 'lodash';
 
 import { BUILT_IN_NORMAL, BUILT_IN_POSITION, BUILT_IN_UV } from './common';
 import { vec3 } from 'gl-matrix';
@@ -234,7 +234,7 @@ export class Geometry {
 
     public setPosData(array: ArrayBufferView): void {
         this.__posIsDirty = true;
-        this.vertAttrib.positions.array = cloneDeep(array);
+        this.vertAttrib.positions.array = _.cloneDeep(array);
         this.__computeRange();
     }
 
@@ -249,7 +249,7 @@ export class Geometry {
     }
 
     public copyFrom(geo: Geometry) {
-        this.vertAttrib = cloneDeep(geo.vertAttrib);
+        this.vertAttrib = _.cloneDeep(geo.vertAttrib);
         this.__computeRange();
     }
 }
